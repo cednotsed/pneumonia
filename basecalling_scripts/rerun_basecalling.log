@@ -1,0 +1,311 @@
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_24.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_24
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_24/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_24/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 1 input read file to process.
+Init time: 5684 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 8278 ms, Samples called: 20701881, samples/s: 2.50083e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_24.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_44.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_44
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_44/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_44/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 417 input read files to process.
+Init time: 3077 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 21247916 ms, Samples called: 59686926692, samples/s: 2.80907e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_44.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_45.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_45
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_45/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_45/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 998 input read files to process.
+Init time: 3985 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 61004747 ms, Samples called: 130211473019, samples/s: 2.13445e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_45.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_46.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_46
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_46/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_46/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 338 input read files to process.
+Init time: 3960 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 14468807 ms, Samples called: 41625988410, samples/s: 2.87695e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_46.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_47.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_47
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_47/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_47/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 863 input read files to process.
+Init time: 7480 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 49000385 ms, Samples called: 110629970649, samples/s: 2.25774e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_47.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_48.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_48
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_48/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_48/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 348 input read files to process.
+Init time: 6433 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 17253507 ms, Samples called: 43675194665, samples/s: 2.53138e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_48.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_49.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_49
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_49/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_49/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 978 input read files to process.
+Init time: 4917 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 55029811 ms, Samples called: 144425105733, samples/s: 2.62449e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_49.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_4.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_4
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_4/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_4/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 326 input read files to process.
+Init time: 3987 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 27132156 ms, Samples called: 54347206433, samples/s: 2.00306e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_4.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_50.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_50
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_50/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_50/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 736 input read files to process.
+Init time: 10089 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 29970221 ms, Samples called: 116068118294, samples/s: 3.87278e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_50.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_51.tar
+/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_51
+BASECALLING...
+ONT Guppy basecalling software version 6.5.7+ca6d6af, minimap2 version 2.24-r1122
+config file:        /SAN/ugi/HAP_VAP/ont-guppy/data/dna_r9.4.1_450bps_hac.cfg
+model file:         /SAN/ugi/HAP_VAP/ont-guppy/data/template_r9.4.1_450bps_hac.jsn
+input path:         /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_51/multi_fast5s
+save path:          /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_51/basecalled_fastqs
+chunk size:         1024
+chunks per runner:  768
+minimum qscore:     9
+records per file:   4000
+fastq compression:  ON
+num basecallers:    14
+gpu device:         cuda:0
+kernel path:        
+runners per device: 8
+
+Use of this software is permitted solely under the terms of the end user license agreement (EULA).
+By running, copying or accessing this software, you are demonstrating your acceptance of the EULA.
+The EULA may be found in /SAN/ugi/HAP_VAP/ont-guppy/bin
+Found 890 input read files to process.
+Init time: 5619 ms
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Caller time: 47915013 ms, Samples called: 111890391561, samples/s: 2.33518e+06
+Finishing up any open output files.
+Basecalling completed successfully.
+DONE /SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_51.tar
+ALL FILES COMPLETED!!!

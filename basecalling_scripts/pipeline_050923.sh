@@ -8,52 +8,51 @@
 #$ -N basecalling
 
 base_dir=/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s
-threads=6
+threads=32
 
 for i in $base_dir/*.tar
 do
   echo $i
   #i=/SAN/ugi/HAP_VAP/pneumonia/data/raw_fast5s/INHALE_FRESH_14.tar
   fast5_dir=$(echo $i|sed "s|.tar||g")
+  in_dir=$fast5_dir/multi_fast5s
+  out_dir=$fast5_dir/basecalled_fastqs
+  temp_dir=$fast5_dir/all_fast5s
   echo $fast5_dir
 
-  # Untar
-  echo UNTARRING...
-  mkdir $fast5_dir
-  tar -xf $i -C $fast5_dir --strip-components=1
-
-  # Shift fast5s
-  echo PROCESSING FAST5s
-  temp_dir=$fast5_dir/all_fast5s
-  mkdir $temp_dir
-  #find $fast5_dir -type f|grep \.fast5|xargs -P6 -I'{}' mv '{}' $temp_dir
-  mv $fast5_dir/* $temp_dir
-
-  # Make multi fast5s
-  echo concatenate fast5s
-  in_dir=$fast5_dir/multi_fast5s
-  mkdir $in_dir
-
-  single_to_multi_fast5 \
-    --input_path $temp_dir \
-    --save_path $in_dir \
-    --threads $threads \
-    --recursive \
-    --batch_size 4096
-
-  # Clear single fast5s
-  find $temp_dir -type f| grep \.fast5| xargs -P $threads -I '{}' rm '{}'
-  rm -r $temp_dir
+#  # Untar
+#  echo UNTARRING...
+#  mkdir $fast5_dir
+#  tar -xf $i -C $fast5_dir --strip-components=1
+#
+#  # Shift fast5s
+#  echo PROCESSING FAST5s
+#  mkdir $temp_dir
+#  mv $fast5_dir/* $temp_dir
+#
+#  # Make multi fast5s
+#  echo concatenate fast5s
+#  mkdir $in_dir
+#
+#  single_to_multi_fast5 \
+#    --input_path $temp_dir \
+#    --save_path $in_dir \
+#    --threads $threads \
+#    --recursive \
+#    --batch_size 4096
+#
+#  # Clear single fast5s
+#  find $temp_dir -type f| grep \.fast5| xargs -P $threads -I '{}' rm '{}'
+#  rm -r $temp_dir
 
   # Basecalling
   echo BASECALLING...
-  out_dir=$fast5_dir/basecalled_fastqs
   /SAN/ugi/HAP_VAP/ont-guppy/bin/guppy_basecaller \
     --device "cuda:0" \
     --input_path $in_dir \
     --save_path $out_dir \
     --config dna_r9.4.1_450bps_hac.cfg \
-    --barcode_kits "SQK-RBK004" \
+    --barcode_kits "SQK-RPB004" \
     --detect_adapter \
     --detect_barcodes \
     --detect_primer \
