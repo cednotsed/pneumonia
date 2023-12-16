@@ -1,9 +1,11 @@
-fastq_path=../data/basecalled_fastqs/SaminaPool1-barcode12.fastq.gz
+sum_path=../data/sequencing_summaries/INHALE_FRESH_5_sequencing_summary.txt
 
 NanoPlot \
-  -t 2 \
-  --fastq $fastq_path \
-  --maxlength 100000 \
-  --plots {kde,hex,dot} \
+  -t 6 \
+  --summary $sum_path \
+  --loglength \
   --outdir ./test
+#  --maxlength 100000 \
+#  --plots {kde,hex,dot} \
+#  --outdir ./test
 
