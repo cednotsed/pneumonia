@@ -20,7 +20,7 @@ mkdir $out_dir
 
 # Basecalling
 echo BASECALLING...
-/SAN/ugi/HAP_VAP/ont-guppy/bin/guppy_basecaller \
+~/ont-guppy/bin/guppy_basecaller \
   --device "cuda:0" \
   --input_path $in_dir \
   --save_path $out_dir \
@@ -39,9 +39,9 @@ echo BASECALLING...
   --num_callers 14 \
   --num_barcoding_threads $threads \
   --num_read_splitting_threads $threads \
-  --gpu_runners_per_device 8 \
-  --chunks_per_runner 768 \
-  --chunk_size 1024 \
+  --gpu_runners_per_device 4 \
+  --chunks_per_runner 256 \
+  --chunk_size 256 \
   --do_read_splitting \
   --detect_mid_strand_adapter \
   --detect_mid_strand_barcodes \
