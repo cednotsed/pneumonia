@@ -32,7 +32,7 @@ total_RA <- long_df %>%
   group_by(genus) %>%
   summarise(total_rel_a = sum(rel_a)) %>%
   arrange(desc(total_rel_a)) %>%
-  head(20)
+  head(30)
 
 # Sample counts
 count_df <- long_df %>%
@@ -47,6 +47,7 @@ clustering <- hclust(df_dist)
 pal <- distinctColorPalette(n_distinct(long_df$genus))
 
 long_df %>%
+  filter(rel_a > 0.1) %>%
   mutate(run_id = factor(run_id, rownames(df_mat)[clustering$order])) %>%
   filter(genus %in% total_RA$genus) %>%
   ggplot(aes(x = run_id, y = rel_a, fill = genus)) +
@@ -121,3 +122,7 @@ species_df %>%
   filter(run_id == "46_2") %>%
   filter(rel_a > 0) %>%
   arrange(desc(rel_a))
+
+long_df %>% filter(hap_vap_cap == "Water control") %>%
+  filter(rel_a != 0) %>% 
+  distinct(genus) %>% View()

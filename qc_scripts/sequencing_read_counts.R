@@ -14,13 +14,11 @@ read_df <- foreach(file = file_list, .combine = "bind_rows") %do% {
   id <- gsub(file_dir, "", file)
   id <- gsub("_sequencing_summary.parsed.csv.gz", "", id)
   
-  temp <- fread(file)
-  temp %>%
-    group_by(passes_filtering, barcode_arrangement) %>%
-    summarise(median_qscore = median(mean_qscore_template),
-              median_length = median(sequence_length_template),
-              n_reads = n_distinct(read_id)) %>%
+  temp <- fread(file) %>%
+    filter(barcode_arrangement != "unclassified") %>%
     mutate(run = id)
+  
+  return(temp)
 }
 
 # PASS FAIL UNCLASSIFIED

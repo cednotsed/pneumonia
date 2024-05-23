@@ -44,6 +44,6 @@ meta <- fread("data/metadata/patient_metadata.csv") %>%
   filter(!(sample_id %in% c("Special", "Failed Run - 26"))) %>%
   mutate(run_id = gsub("a|A", "", run_id))
 
-
+# Include microbial read count
 fwrite(meta, "data/metadata/parsed_patient_metadata.csv")
 

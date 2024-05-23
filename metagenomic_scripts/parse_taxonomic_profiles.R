@@ -31,7 +31,7 @@ RA_to_PA <- function(RA_df, PA_threshold) {
   return(prev_RA)
 }
 
-rank <- "F"
+rank <- "S"
 
 meta <- fread("data/metadata/parsed_patient_metadata.csv")
 high_microbes <- fread(str_glue("results/qc_out/high_microbe_samples.{rank}.csv"))
@@ -76,7 +76,7 @@ RA_filt %>%
   fwrite(str_glue("results/metagenomic_out/RA.{rank}.zeroed.csv"),
          row.names = F)
 
-nrow(RA_filt)
+ncol(RA_filt)
 # dat_filt %>%
 #   filter(run_id == "1_1")
 # otu_to_RA(dat_filt) %>%
@@ -89,3 +89,6 @@ nrow(RA_filt)
 # dat_filt["1_1", ] %>%
 #   pivot_longer(everything(), names_to = "species", values_to = "read_count") %>%
 #   arrange(desc(read_count))
+
+meta_filt$ %>%
+  summarise(max(n_reads))

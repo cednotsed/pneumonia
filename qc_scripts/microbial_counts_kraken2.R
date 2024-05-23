@@ -7,7 +7,7 @@ require(doParallel)
 meta <- fread("data/metadata/parsed_patient_metadata.csv")
 high_reads <- fread("results/qc_out/high_read_samples.csv")
 
-rank <- "F"
+rank <- "S"
 
 dat <- fread(str_glue("results/metagenomic_out/abundance_matrix.{rank}.tsv")) %>%
   select(-any_of(c("Homo sapiens", "Homo")), -unclassified) %>%
@@ -42,5 +42,4 @@ microbe_df %>%
 
 microbe_df %>%
   filter(microbial_reads >= 1000) %>%
-  select(run_id) %>%
   fwrite(str_glue("results/qc_out/high_microbe_samples.{rank}.csv"))
