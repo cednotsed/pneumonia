@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH --job-name=checkm_arr   # Job name
+#SBATCH --ntasks=1                  # Run a single task
+#SBATCH --mem=64gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/assembly_scripts/logs/checkm2_%A-%a.log    # Standard output and error log
+#SBATCH --cpus-per-task=16
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate checkm2
+
+#SLURM_ARRAY_TASK_ID=5
+threads=16
+wkdir=/flask/scratch/matthewsp/pneumonia
+fastq_list=../tax_classification_scripts/fastq_list.txt
+fastq_basedir=$wkdir/data/basecalled_fastqs/no_humans
+fq=$(head -n $SLURM_ARRAY_TASK_ID $fastq_list|tail -n 1)
+in_basedir=$wkdir/results/assembly_out/medaka_out
+prefix=$(echo $fq| sed "s|.fastq.gz||g")
+in_dir=$in_basedir/$prefix
+bin_dir=$in_dir/bin_dir
+out_dir=$in_dir/checkm2_out
+db=$wkdir/databases/checkm2_db_V2.230321/uniref100.KO.1.dmnd
+
+checkm2 predict \
+    -x fa \
+    --threads $threads \
+    -i $bin_dir \
+    -o $out_dir \
+    --force \
+    --database_path $db

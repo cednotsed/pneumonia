@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH --job-name=prokka_arr   # Job name
+#SBATCH --array=1-3                  # Run a single task
+#SBATCH --mem=32gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/nemo/lab/matthewsp/home/shared/cedric/ARG_host_jumps/pangenome_scripts/prokka_logs/array_%A-%a.log    # Standard output and error log
+#SBATCH --cpus-per-task=12
+
+start=`date +%s`
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate prokka
+
+# Parse array input
+#SLURM_ARRAY_TASK_ID=1
+config_file=$1
+cluster_name=$(head -n $SLURM_ARRAY_TASK_ID $config_file|tail -n 1)
+
+wkdir=/flask/scratch/matthewsp/pneumonia
+in_basedir=/flask/scratch/matthewsp/extracted_cluster_flanking_regions
+fasta_dir=$in_basedir/$cluster_name
+out_basedir=/flask/scratch/matthewsp/prokka_out/$cluster_name
+
+mkdir $out_basedir
+echo $out_basedir
+
+find $fasta_dir -type f| grep .fna| xargs -P12 -I"{}" sh prokka.sh "{}" "$out_basedir" "$fasta_dir"
+
+# Completion file
+touch $out_basedir/$cluster_name.done.flag
+

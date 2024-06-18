@@ -1,0 +1,43 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --time=48:00:00
+#SBATCH --mem=24G
+#SBATCH --gres=gpu:1
+#SBATCH --partition=gpu
+#SBATCH --cpus-per-task=16
+#SBATCH --job-name=ass_arr   # Job name
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/assembly_scripts/logs/medaka_gpu_%A-%a.log    # Standard output and error log
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate medaka
+
+SLURM_ARRAY_TASK_ID=$1
+
+wkdir=/flask/scratch/matthewsp/pneumonia
+#fastq_list=../tax_classification_scripts/fastq_list.txt
+fastq_list=new_to_do.txt
+fastq_basedir=$wkdir/data/basecalled_fastqs/no_humans
+fq=$(head -n $SLURM_ARRAY_TASK_ID $fastq_list|tail -n 1)
+ass_basedir=$wkdir/results/assembly_out/metaflye_out
+out_basedir=$wkdir/results/assembly_out/medaka_out
+
+in_fastq=$fastq_basedir/$fq
+in_dir=$ass_basedir/$(echo $fq| sed "s|.fastq.gz||g")
+out_dir=$(echo $in_dir| sed "s|$ass_basedir|$out_basedir|g")
+
+echo $in_fastq
+echo $in_dir
+echo $out_dir
+
+export TF_FORCE_GPU_ALLOW_GROWTH=true
+export CUDA_VISIBLE_DEVICES=1
+
+medaka_consensus \
+  -i $in_fastq \
+  -d $in_dir/assembly.fasta \
+  -o $out_dir \
+  -t 16 \
+  -f \
+  -m r941_min_hac_g507 \
+  -b 16
+

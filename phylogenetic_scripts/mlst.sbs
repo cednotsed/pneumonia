@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --time=48:00:00
+#SBATCH --mem=32G
+#SBATCH --partition=ncpu
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate mlst
+
+# Use either: saureus mcatarrhalis_achtman_6 ecoli
+
+export bug_prefix=m_catarrhalis
+export wkdir=/flask/scratch/matthewsp/pneumonia
+export fna_dir=$wkdir/data/genomes/hunt_et_al_v0.2/$bug_prefix.filt
+export out_dir=$wkdir/results/mlst_out/$bug_prefix.filt
+
+mkdir $out_dir
+
+ls $fna_dir/*.fna| xargs -P 16 -I {} sh -c \
+    'mlst --scheme mcatarrhalis_achtman_6 {} | cut -f1,3 > $(echo {}|sed "s|$fna_dir|$out_dir|g").tsv'
+
+cat $out_dir/*.tsv > $out_dir.mlst.tsv
+

@@ -1,0 +1,45 @@
+#!/bin/bash
+#SBATCH --job-name=prokka_arr   # Job name
+#SBATCH --array=1-413                  # Run a single task
+#SBATCH --mem=32gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/pangenome_scripts/logs/array_%A-%a.log    # Standard output and error log
+#SBATCH --cpus-per-task=4
+
+start=`date +%s`
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate prokka
+
+# Parse array input
+#SLURM_ARRAY_TASK_ID=1
+bug_prefix=m_catarrhalis
+config_file=/flask/scratch/matthewsp/pneumonia/data/metadata/bug_metadata/prokka_batches/$bug_prefix/aa
+fasta_name=$(head -n $SLURM_ARRAY_TASK_ID $config_file|tail -n 1)
+#fasta_name=SAMN03289483.fna
+wkdir=/flask/scratch/matthewsp/pneumonia
+fasta_path=$wkdir/data/genomes/hunt_et_al_v0.2/$bug_prefix.filt/$fasta_name
+out_basedir=$wkdir/results/pangenome_out/prokka_out/$bug_prefix.filt
+
+mkdir $out_basedir
+
+prefix=$(echo $fasta_name| sed "s|.fna||g")
+
+echo $config_file
+echo $fasta_path
+echo $prefix
+echo $out_basedir
+
+prokka \
+        --prefix $prefix \
+        --kingdom Bacteria \
+        --norrna \
+        --notrna \
+        --evalue 1e-9 \
+        --coverage 80 \
+        --outdir $out_basedir \
+        --cpus 4 \
+        --quiet \
+        --force \
+        $fasta_path
+

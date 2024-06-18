@@ -1,11 +1,12 @@
-wkdir=/mnt/c/git_repos/pneumonia
+wkdir=/flask/scratch/matthewsp/pneumonia
 taxid_list=$wkdir/data/metadata/irep/references_to_download.txt
 genome_basedir=$wkdir/data/genomes/irep
 
-while read taxid
+while read line
 do
+    taxid=$(echo $line|cut -d',' -f1)
     out_dir=$genome_basedir/$taxid
-    mkdir $out_dir   
+    mkdir $out_dir
 
     ncbi-genome-download \
         --taxids $taxid \

@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=48:00:00
+#SBATCH --mem=64G
+#SBATCH --partition=ncpu
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate treemer
+
+RTL=0.9
+#prefix=k_pneumoniae
+#prefix=s_aureus
+prefix=m_catarrhalis
+tree_path=../data/trees/${prefix}_BG.mashtree.tree
+
+# Subsample
+python3 ~/Treemmer/Treemmer_v0.3.py $tree_path
+python3 ~/Treemmer/Treemmer_v0.3.py $tree_path -RTL $RTL
+

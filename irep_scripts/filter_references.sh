@@ -1,4 +1,4 @@
-wkdir=/mnt/c/git_repos/pneumonia
+wkdir=/flask/scratch/matthewsp/pneumonia
 genome_basedir=$wkdir/data/genomes/irep
 out_basedir=$wkdir/data/genomes/irep_filt
 
@@ -7,7 +7,7 @@ do
     taxid=$(echo $dir|sed "s|$genome_basedir/||g")
     out_dir=$out_basedir/$taxid
     echo $out_dir
-    mkdir $out_dir   
+    mkdir $out_dir
 
     # Copy first reference only
     first_file=$(ls $dir/*.fna.gz|head -n 1)

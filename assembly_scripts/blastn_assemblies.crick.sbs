@@ -1,0 +1,34 @@
+#!/bin/bash
+#SBATCH --job-name=viral_blast   # Job name
+#SBATCH --ntasks=1                  # Run a single task
+#SBATCH --mem=64gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/assembly_scripts/logs/viral_blast_%A-%a.log    # Standard output and error log
+#SBATCH --cpus-per-task=16
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate metagenomics
+
+threads=16
+wkdir=/flask/scratch/matthewsp/pneumonia
+ref=$wkdir/data/genomes/tan_et_al_2024_viral_genomes/all_viruses.220723.filt.formatted.QCed.fna
+query=$wkdir/results/assembly_out/all_contigs.renamed.fna
+out=$wkdir/results/assembly_out/viral_blast_out/all_contigs.renamed.blast.tsv
+
+db=$wkdir/databases/tan_et_al_2024_viral_genomes.blastn_db/tan_et_al_2024_viral_genomes.blastn_db
+
+# Make blastn database
+makeblastdb -input_type fasta \
+	-in $ref \
+	-out $db \
+	-parse_seqids \
+	-title "tan_et_al_2024_viral_genomes" \
+	-dbtype nucl
+
+blastn -db ${db} \
+  -task dc-megablast \
+  -query ${query} \
+  -out ${out} \
+  -qcov_hsp_perc 99 \
+  -outfmt 6 \
+  -num_threads $threads

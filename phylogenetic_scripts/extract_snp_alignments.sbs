@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --time=48:00:00
+#SBATCH --mem=64G
+#SBATCH --partition=ncpu
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate philodendron
+
+bug_prefix=e_coli
+#bug_prefix=m_catarrhalis
+#bug_prefix=s_aureus
+
+for bug_prefix in e_coli
+do
+    basedir=/flask/scratch/matthewsp/pneumonia/results/pangenome_out
+    aln_path=$basedir/$bug_prefix.filt/core_gene_alignment_filtered.aln
+    out_path=$basedir/$bug_prefix.filt/$bug_prefix.core_gene_alignment_filtered.snps.aln
+    
+    echo $aln_path 
+    echo $out_path
+
+    snp-sites $aln_path -o $out_path
+done
+

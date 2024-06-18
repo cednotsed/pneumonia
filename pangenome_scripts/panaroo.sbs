@@ -1,0 +1,33 @@
+#!/bin/bash
+#SBATCH --job-name=panaroo   # Job name
+#SBATCH --mem=200gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/pangenome_scripts/logs/panaroo_%A-%a.log    # Standard output and error log
+#SBATCH --cpus-per-task=12
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate prokka
+
+bug_prefix=e_coli
+wkdir=/flask/scratch/matthewsp/pneumonia
+prokka_dir=$wkdir/results/pangenome_out/prokka_out/$bug_prefix.filt
+out_dir=$wkdir/results/pangenome_out/$bug_prefix.filt
+
+mkdir -p $out_dir
+
+panaroo \
+    -i $prokka_dir/*.gff \
+    -o $out_dir \
+    --clean-mode strict \
+    --refind_prop_match 0.8 \
+    --search_radius 5000 \
+    -t 12 \
+    --threshold 0.98 \
+    --len_dif_percent 0.98 \
+    --family_threshold 0.7 \
+    --codon-table 11 \
+    -a core \
+    --aligner mafft \
+    --codons \
+
+touch $out_dir/$bug_prefix.done.flag

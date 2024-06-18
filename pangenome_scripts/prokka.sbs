@@ -1,0 +1,29 @@
+fasta=$1
+out_basedir=$2
+fasta_dir=$3
+
+prefix=$(echo $fasta|sed "s|$fasta_dir/||g"|sed "s|.fna||g")
+
+echo $fasta
+echo $prefix
+echo $out_basedir
+
+prokka \
+        --prefix $prefix \
+        --kingdom Bacteria \
+        --norrna \
+        --notrna \
+        --evalue 1e-9 \
+        --coverage 80 \
+        --outdir $out_basedir \
+        --cpus 1 \
+        --quiet \
+        --force \
+        $fasta
+
+# Move only important files
+ls $subdir/${prefix}*| grep -e .ffn -e .faa -e .gff|grep -v .tmp.| xargs -I'{}' mv '{}' $out_basedir
+
+# Clean up
+rm -r $subdir
+

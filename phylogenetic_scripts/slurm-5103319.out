@@ -1,0 +1,50 @@
+IQ-TREE multicore version 2.2.6 COVID-edition for Linux 64-bit built Dec  8 2023
+Developed by Bui Quang Minh, James Barbetti, Nguyen Lam Tung,
+Olga Chernomor, Heiko Schmidt, Dominik Schrempf, Michael Woodhams, Ly Trong Nhan.
+
+Host:    cn057 (AVX2, FMA3, 2014 GB RAM)
+Command: iqtree2 -nt 8 -s /flask/scratch/matthewsp/pneumonia/data/alignments/s_aureus.core_gene_alignment_filtered.snps.trimmed.aln -m MFP --prefix /flask/scratch/matthewsp/pneumonia/data/trees/s_aureus.core_gene_alignment_filtered.snps.trimmed.fast --fast
+Seed:    638598 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Mon Jun 17 15:31:05 2024
+Kernel:  AVX+FMA - 8 threads (32 CPU cores detected)
+
+Reading alignment file /flask/scratch/matthewsp/pneumonia/data/alignments/s_aureus.core_gene_alignment_filtered.snps.trimmed.aln ... Fasta format detected
+Reading fasta file: done in 15.1896 secs using 95.44% CPU
+Alignment most likely contains DNA/RNA sequences
+Constructing alignment: done in 8.85665 secs using 83.12% CPU
+Alignment has 2425 sequences with 309771 columns, 245218 distinct patterns
+134227 parsimony-informative, 146868 singleton sites, 28676 constant sites
+Analyzing sequences: done in 0.996329 secs using 739.9% CPU
+NOTE: minimal branch length is reduced to 0.000000322819 for long alignment
+Checking for duplicate sequences: done in 0.840871 secs using 749.7% CPU
+
+
+Create initial parsimony tree by phylogenetic likelihood library (PLL)... 346.465 seconds
+Perform fast likelihood tree search using GTR+I+G model...
+Estimate model parameters (epsilon = 5.000)
+Perform nearest neighbor interchange...
+Optimizing NNI: done in 614.09 secs using 794.4% CPU
+Estimate model parameters (epsilon = 1.000)
+1. Initial log-likelihood: -4708903.136
+2. Current log-likelihood: -4708901.711
+Optimal log-likelihood: -4708901.125
+Rate parameters:  A-C: 0.97588  A-G: 3.40213  A-T: 1.59704  C-G: 0.44083  C-T: 4.27551  G-T: 1.00000
+Base frequencies:  A: 0.285  C: 0.226  G: 0.245  T: 0.244
+Proportion of invariable sites: 0.000
+Gamma shape alpha: 2.561
+Parameters optimization took 2 rounds (303.063 sec)
+Time for fast ML tree search: 3134.283 seconds
+
+NOTE: ModelFinder requires 192820 MB RAM!
+ModelFinder will test up to 484 DNA models (sample size: 309771) ...
+ No. Model         -LnL         df  AIC          AICc         BIC
+  1  GTR+F         4740963.506  4855 9491637.012  9491791.651  9543311.635
+  2  GTR+F+I       4740963.484  4856 9491638.968  9491793.672  9543324.235
+  3  GTR+F+G4      4708900.101  4856 9427512.203  9427666.906  9479197.469
+  4  GTR+F+I+G4    4708900.035  4857 9427514.069  9427668.837  9479209.979
+  5  GTR+F+R2      4647178.977  4857 9304071.953  9304226.721  9355767.863
+WARNING: Log-likelihood -4.64722e+06 of GTR+F+R3 worse than GTR+F+R2 -4.64718e+06
+  6  GTR+F+R3      4647216.079  4859 9304150.159  9304305.055  9355867.356
+ 14  GTR+F+I+R2    4670935.631  4858 9351587.261  9351742.093  9403293.815
+ 15  GTR+F+I+R3    4643142.425  4860 9296004.851  9296159.811  9347732.691
+slurmstepd: error: acct_gather_profile/influxdb _send_data: curl_easy_perform failed to send data (discarded). Reason: Couldn't connect to server

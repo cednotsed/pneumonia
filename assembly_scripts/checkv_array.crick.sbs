@@ -1,0 +1,25 @@
+#!/bin/bash
+#SBATCH --job-name=checkv   # Job name
+#SBATCH --ntasks=1                  # Run a single task
+#SBATCH --mem=64gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/assembly_scripts/logs/checkv.log    # Standard output and error log
+#SBATCH --cpus-per-task=16
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate checkv
+
+threads=16
+wkdir=/flask/scratch/matthewsp/pneumonia
+in_path=$wkdir/results/assembly_out/all_contigs.renamed.fna
+out_dir=$wkdir/results/assembly_out/checkv_out
+db=$wkdir/databases/checkv-db-v1.5
+
+mkdir $out_dir
+
+checkv end_to_end \
+        -t $threads \
+        -d $db \
+        --remove_tmp \
+        --restart \
+        $in_path $out_dir

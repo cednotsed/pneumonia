@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH --job-name=mashtree   # Job name
+#SBATCH --ntasks=1                  # Run a single task
+#SBATCH --mem=120gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/phylogenetic_scripts/logs/mashtree_%A-%a.log    # Standard output and error log
+#SBATCH --cpus-per-task=12
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate philodendron
+
+prefix=e_coli
+prefix=m_catarrhalis
+wkdir=/flask/scratch/matthewsp/pneumonia
+fna_dir=$wkdir/data/genomes/hunt_et_al_v0.2/$prefix.uk
+out_path=$wkdir/data/trees/${prefix}_BG.mashtree.tree
+
+mashtree \
+    --mindepth 0 \
+    --numcpus 12 \
+    $fna_dir/*.fna \
+    > $out_path

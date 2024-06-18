@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=16
+#SBATCH --time=48:00:00
+#SBATCH --mem=120G
+#SBATCH --partition=ncpu
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate philodendron
+
+bug_prefix=e_coli
+#bug_prefix=m_catarrhalis
+#bug_prefix=s_aureus
+
+wkdir=/flask/scratch/matthewsp/pneumonia
+aln_path=$wkdir/data/alignments/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.aln
+tree_path=$wkdir/data/trees/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.vfasttree.tree
+out_prefix=$wkdir/data/trees/clonal_frame/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.vfasttree.recomb_pruned
+
+#aln_path=$wkdir/data/alignments/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.aln
+#tree_path=$wkdir/data/trees/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.treefile
+#out_prefix=$wkdir/data/trees/clonal_frame/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.iqtree2.recomb_pruned
+
+ClonalFrameML \
+    $tree_path $aln_path $out_prefix \
+    -output_filtered true

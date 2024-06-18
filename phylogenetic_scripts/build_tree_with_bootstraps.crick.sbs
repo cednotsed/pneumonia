@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --time=48:00:00
+#SBATCH --mem=128G
+#SBATCH --partition=ncpu
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate philodendron
+
+#bug_prefix=e_coli
+bug_prefix=m_catarrhalis
+bug_prefix=s_aureus
+
+wkdir=/flask/scratch/matthewsp/pneumonia
+aln_path=$wkdir/data/alignments/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.aln
+out_path=$wkdir/data/trees/$bug_prefix.core_gene_alignment_filtered.snps.trimmed
+
+iqtree2 \
+        -nt AUTO \
+        -s $aln_path \
+        -m MFP \
+        --prefix $out_path \
+        -B 1000
+
+echo $aln_path DONE!!!

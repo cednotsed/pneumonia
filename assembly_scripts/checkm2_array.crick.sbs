@@ -1,0 +1,25 @@
+#!/bin/bash
+#SBATCH --job-name=checkm_arr   # Job name
+#SBATCH --ntasks=1                  # Run a single task
+#SBATCH --mem=64gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/assembly_scripts/logs/checkm2_%A-%a.log    # Standard output and error log
+#SBATCH --cpus-per-task=16
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate checkm2
+
+threads=16
+wkdir=/flask/scratch/matthewsp/pneumonia
+in_dir=$wkdir/results/assembly_out/bin_out
+out_dir=$wkdir/results/assembly_out/checkm2_out
+db=$wkdir/databases/checkm2_db_V2.230321/uniref100.KO.1.dmnd
+
+# Runs checkm on all bins
+checkm2 predict \
+    -x fna \
+    --threads $threads \
+    -i $in_dir \
+    -o $out_dir \
+    --force \
+    --database_path $db
