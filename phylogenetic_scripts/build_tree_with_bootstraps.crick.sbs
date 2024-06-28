@@ -10,14 +10,17 @@ conda activate philodendron
 
 #bug_prefix=e_coli
 bug_prefix=m_catarrhalis
-bug_prefix=s_aureus
+#bug_prefix=s_aureus
 
 wkdir=/flask/scratch/matthewsp/pneumonia
-aln_path=$wkdir/data/alignments/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.aln
-out_path=$wkdir/data/trees/$bug_prefix.core_gene_alignment_filtered.snps.trimmed
+#aln_path=$wkdir/data/alignments/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.aln
+#out_path=$wkdir/data/trees/$bug_prefix.core_gene_alignment_filtered.snps.trimmed
+
+aln_path=$wkdir/data/alignments/$bug_prefix.core_genes.gubbins_pruned.trimmed.aln
+out_path=$wkdir/data/trees/$bug_prefix.core_genes.gubbins_pruned.trimmed.iqtree2
 
 iqtree2 \
-        -nt AUTO \
+        -nt 4 \
         -s $aln_path \
         -m MFP \
         --prefix $out_path \
