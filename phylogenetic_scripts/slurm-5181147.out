@@ -1,6 +1,0 @@
-ClonalFrameML v1.13
-output_filtered = true
-Finished reading in control file.
-
-Read 2900 sequences of length 703934 sites from /flask/scratch/matthewsp/pneumonia/data/alignments/e_coli.core_gene_alignment_filtered.snps.trimmed.aln
-slurmstepd: error: acct_gather_profile/influxdb _send_data: curl_easy_perform failed to send data (discarded). Reason: Couldn't connect to server
