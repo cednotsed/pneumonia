@@ -1,0 +1,41 @@
+#!/bin/bash
+#SBATCH --job-name=irep_arr   # Job name
+#SBATCH --mem=64gb                   # Job Memory
+#SBATCH --time=48:00:00            # Time limit hrs:min:sec
+#SBATCH --output=/flask/scratch/matthewsp/pneumonia/irep_scripts/logs/irep_%A_%a.log    # Standard output and error log
+#SBATCH --cpus-per-task=24
+
+source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
+conda activate irep
+
+SLURM_ARRAY_TASK_ID=1
+wkdir=/flask/scratch/matthewsp/pneumonia
+config_file=$wkdir/tax_classification_scripts/fastq_list.txt
+config_file=$wkdir/irep_scripts/missing.txt
+export fastq_dir=$wkdir/data/basecalled_fastqs/no_humans
+export ref_dir=$wkdir/data/genomes/irep_filt
+export out_dir=$wkdir/results/irep_out/mapping_out
+export irep_dir=$wkdir/results/irep_out/irep_out
+export fastq_name=$(head -n $SLURM_ARRAY_TASK_ID $config_file|tail -n 1)
+export fastq_path=$fastq_dir/$fastq_name
+
+cat reference_paths.missing.txt| \
+    xargs -P8 -I{} \
+    sh -c 'ref_path=$ref_dir/{}; \
+           taxid=$(echo {}| cut -d'/' -f1);
+           prefix=$(echo $fastq_name|sed "s|.no_human.fastq.gz||g");
+           out_path=$out_dir/$prefix.$taxid.sam;
+           echo $ref_path;
+           echo $out_path;
+           echo $taxid;
+           minimap2 \
+            -ax map-ont \
+            -t 4 \
+            $ref_path $fastq_path | \
+            samtools view -h -F4 -F256 -F2048 - > $out_path;
+           bPTR \
+               -f $ref_path \
+               -s $out_path \
+               -o $irep_dir/$prefix.$taxid.bPTR.tsv \
+               -plot $irep_dir/$prefix.$taxid.pdf \
+               -m coverage'
