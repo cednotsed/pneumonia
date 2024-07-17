@@ -44,6 +44,18 @@ meta <- fread("data/metadata/patient_metadata.csv") %>%
   filter(!(sample_id %in% c("Special", "Failed Run - 26"))) %>%
   mutate(run_id = gsub("a|A", "", run_id))
 
-# Include microbial read count
-fwrite(meta, "data/metadata/parsed_patient_metadata.csv")
+# Controls
+control <- fread("data/metadata/control_metadata.csv") %>%
+  mutate(barcode = as.character(barcode)) %>%
+  mutate(run_id = str_glue("{run}_{barcode}")) %>%
+  mutate(hap_vap_cap = "healthy", hospital = "Local GP (controls)")
+
+meta %>%
+  bind_rows(control) %>%
+  mutate(hap_vap2 = case_when(hap_vap_cap == "HAP" & vent_lenght_hours < 1 ~ "NV-HAP",
+                                 hap_vap_cap == "HAP" & vent_lenght_hours > 0 ~ "V-HAP",
+                                 hap_vap_cap == "VAP" ~ "VAP")) %>%
+  mutate(ventilation = vent_lenght_hours > 0) %>%
+  fwrite("data/metadata/parsed_patient_metadata.csv")
+
 

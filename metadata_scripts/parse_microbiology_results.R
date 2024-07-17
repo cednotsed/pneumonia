@@ -5,8 +5,8 @@ require(data.table)
 require(foreach)
 require(Biostrings)
 
-meta <- fread("data/metadata/parsed_patient_metadata.csv") %>%
-  filter(hap_vap_cap != "Water control")
+meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP"))
 
 morsels <- foreach(id = unique(meta$run_id)) %do% {
   print(id)
@@ -30,16 +30,23 @@ morsels <- foreach(id = unique(meta$run_id)) %do% {
 }
 
 parsed <- bind_rows(morsels) %>% 
+  filter(bugs != "") %>%
   mutate(bugs = gsub("\\(|>=10\\^7\\)|\\+|\\)|\\^", "", bugs)) %>%
   mutate(bugs = gsub("[[:digit:]]+", "", bugs)) %>% 
   mutate(bugs = trimws(bugs, "both")) %>%
   mutate(bugs = gsub("E. cloaceae", "Enterobacter cloaceae", bugs)) %>% 
   mutate(bugs = gsub("Human Adenovirus", "Mastadenovirus", bugs)) %>% 
-  filter(bugs != "Invalid test") %>%
-  filter(bugs != "") %>%
   separate(bugs, c("bug_genus"), "\\ ", remove = F) %>% 
   mutate(bug_genus = ifelse(grepl("metapneumovirus", bugs), "Metapneumovirus", bug_genus)) %>%
   mutate(bug_genus = ifelse(grepl("rhinovirus", bugs), "Enterovirus", bug_genus)) %>%
+  mutate(validity = ifelse(is.na(validity), "Valid", validity)) %>%
+  mutate(validity = ifelse(grepl("Partial", validity), "Invalid", validity))
+
+parsed %>%
+  fwrite("data/metadata/parsed_microbiology_results.csv")
+
+parsed_filt <- parsed %>%
+  filter(bugs != "Invalid test") %>%
   filter(bug_genus != "Coliform") %>%
   filter(!grepl("virus", bug_genus)) %>%
   filter(!grepl("virus", bugs)) %>%
@@ -49,17 +56,6 @@ parsed <- bind_rows(morsels) %>%
                                    bugs, 
                                    ignore.case = T))
 
+parsed_filt %>%
+  fwrite("data/metadata/parsed_microbiology_results.bacterial_sp_only.csv")
 
-
-parsed %>%
-  fwrite("data/metadata/parsed_microbiology_results.csv")
-
-# Save list of taxa to download reference genomes
-all_bugs <- parsed %>%
-  filter(species_resolved) %>%
-  distinct(bugs) %>%
-  mutate(accession = "")
-
-fwrite(all_bugs, "data/metadata/bugs_to_download.csv",
-       eol = "\n")
-all_bugs %>% View()

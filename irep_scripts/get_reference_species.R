@@ -1,9 +1,9 @@
+rm(list = ls())
 setwd("c:/git_repos/pneumonia/")
 require(tidyverse)
 require(data.table)
 require(foreach)
 
-high_microbes <- fread("results/qc_out/high_read_samples.csv")
 meta <- fread("data/metadata/parsed_patient_metadata.csv")
 
 rank <- "S"

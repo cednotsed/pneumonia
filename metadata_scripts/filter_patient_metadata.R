@@ -3,25 +3,21 @@ setwd("c:/git_repos/pneumonia/")
 require(tidyverse)
 require(data.table)
 
-meta <- fread("data/metadata/parsed_patient_metadata.csv")
-
-high_microbe <- fread("results/qc_out/high_microbe_samples.S.csv")
-high_read <- fread("results/qc_out/high_read_samples.csv")
 read_counts <- fread("results/qc_out/sample_read_counts.csv")
 
-meta_filt <- meta %>%
-  filter(run_id %in% high_microbe$run_id) %>%
-  filter(run_id %in% high_read$run_id) %>%
-  left_join(read_counts)
+meta <- fread("data/metadata/parsed_patient_metadata.csv") %>%
+  filter(!grepl("None", run_id)) %>%
+  left_join(read_counts) %>%
+  mutate(n_reads = ifelse(is.na(n_reads), 0, n_reads))
 
-dups <- meta_filt %>%
+dups <- meta %>%
   filter(duplicated(sample_id) & 
            !grepl("water", sample_id, ignore.case = T))
 
-dup_df <- meta_filt %>%
+dup_df <- meta %>%
   filter(sample_id %in% dups$sample_id)
 
-non_dup_df <- meta_filt %>%
+non_dup_df <- meta %>%
   filter(!(sample_id %in% dups$sample_id))
 
 dup_filt <- foreach(sample_name = unique(dup_df$sample_id), .combine = "bind_rows") %do% {
@@ -31,12 +27,36 @@ dup_filt <- foreach(sample_name = unique(dup_df$sample_id), .combine = "bind_row
     head(1)
 }
 
-final <- bind_rows(non_dup_df, dup_filt)
+merged <- bind_rows(non_dup_df, dup_filt)
+
+# Deduplicate water controls
+non_controls <- merged %>%
+  filter(hap_vap_cap != "Water control")
+
+water_controls <- merged %>%
+  filter(hap_vap_cap == "Water control")
+
+water_control_dedup <- foreach(run_name = unique(water_controls$run)) %do% {
+  temp <- water_controls %>%
+    filter(run == run_name) %>%
+    arrange(desc(n_reads)) %>%
+    head(1)
+}
+
+final <- bind_rows(non_controls, water_control_dedup)
+
+# Get total and microbial read counts
+dat <- fread(str_glue("results/tax_classification_out/abundance_matrices/abundance_matrix.G.tsv")) %>%
+  select(-any_of(c("Homo sapiens", "Homo")), -unclassified) %>%
+  as_tibble() %>%
+  column_to_rownames("run_id") 
+
+microbe_df <- tibble(run_id = rownames(dat),
+                     microbial_reads = rowSums(dat))
 
 final %>%
+  left_join(microbe_df) %>% 
+  mutate(microbial_reads = ifelse(is.na(microbial_reads), 0, microbial_reads)) %>%
+  mutate(high_microbe_count = microbial_reads >= 100) %>%
   fwrite("data/metadata/parsed_patient_metadata.filt.csv")
 
-# After filtering
-final %>%
-  ggplot(aes(x = log10(n_reads))) +
-  geom_histogram()

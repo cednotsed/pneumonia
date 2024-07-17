@@ -8,58 +8,78 @@ require(hillR)
 require(ggpubr)
 require(randomcoloR)
 
-meta_filt <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
+meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
   filter(high_microbe_count)
 
-df_filt <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.decontam.csv") %>%
-  filter(run_id %in% meta_filt$run_id)
+controls <- meta %>%
+  filter(hap_vap_cap == "Water control")
 
-long_df <- df_filt %>%
+healthy <- meta %>%
+  filter(hap_vap_cap == "healthy")
+
+RA <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.csv")
+
+irep_df <- fread("results/irep_out/irep_results.parsed.tsv")
+
+irep_binary <- irep_df %>%
+  separate(taxa, c("genus"), "\\ ") %>%
+  group_by(run_id, genus) %>%
+  summarise(replicating = any(!is.na(bPTR)))
+
+control_RA <- RA %>%
+  filter(run_id %in% controls$run_id)
+
+healthy_RA <- RA %>%
+  filter(run_id %in% healthy$run_id)
+
+long_healthy <- healthy_RA %>%
   pivot_longer(!run_id, names_to = "taxa", values_to = "rel_a") %>%
-  left_join(meta_filt)
+  filter(rel_a != 0)
 
-total_RA <- long_df %>%
-  group_by(taxa) %>%
-  summarise(sum_rel_a = sum(rel_a)) %>%
-  arrange(desc(sum_rel_a)) %>%
-  head(20)
+long_control <- control_RA %>%
+  pivot_longer(!run_id, names_to = "taxa", values_to = "rel_a") %>%
+  filter(rel_a != 0) %>%
+  group_by(rel_a != 0)
 
-# Sample counts
-count_df <- long_df %>%
-  filter(rel_a > 0.2) %>%
-  group_by(hap_vap_cap) %>%
-  summarise(n = n_distinct(run_id))
+healthy_mat <- long_healthy %>%
+  # filter(!(taxa %in% long_control$taxa)) %>% View()
+  pivot_wider(id_cols = run_id, names_from = taxa, values_from = rel_a) %>%
+  mutate(across(everything(), ~replace_na(., 0)))
 
 # HCLUST
-df_mat <- df_filt %>% column_to_rownames("run_id")
-df_dist <- vegdist(df_mat, method = "bray")
+healthy_mat <- healthy_mat %>% column_to_rownames("run_id")
+df_dist <- vegdist(healthy_mat, method = "bray")
 clustering <- hclust(df_dist)
 
-pal <- distinctColorPalette(n_distinct(long_df$taxa))
+pal <- distinctColorPalette(n_distinct(long_healthy$taxa))
+pal <-  c("#DF58D0", "#DBBDD9", "#C1E482", "#DE7D52", "#DD557D", "#E2B04B", "#79BA81", "#B2EC63",
+          "#65EED1", "#8D7ADD", "#DCDE49", "#9FE9D9", "#955688", "#759C9F", "#E1D6BA", "#9748E6",
+          "#86EC34", "#DF9C9E", "#6FE792", "#C9F0B3", "#D8E2E6", "#82A1DB", "#878755", "#56DE58",
+          "#E5D587", "#7ECEE5", "#DF9CE1")
 
-long_df %>%
-  mutate(run_id = factor(run_id, rownames(df_mat)[clustering$order])) %>%
-  filter(taxa %in% total_RA$taxa) %>%
+long_healthy %>%
+  left_join(meta) %>%
+  mutate(run_id = factor(run_id, rownames(healthy_mat)[clustering$order])) %>%
   ggplot(aes(x = run_id, y = rel_a, fill = taxa)) +
   geom_bar(stat = "identity",
            position = "stack",
            color = "black") +
   scale_fill_manual(values = pal, na.translate = F) +
   theme_bw() +
-  facet_wrap(~hap_vap_cap, 
-             nrow = 2, ncol = 2, scales = "free") +
+  # facet_wrap(~hap_vap_cap, 
+  #            nrow = 2, ncol = 2, scales = "free") +
   theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
         # axis.text.x = element_text(angle = 90, vjust = 0.5),
         legend.position = "top") +
   labs(x = "Patient", y = "Relative abundance",
        fill = "Genus")
-  geom_text(aes(x = 0, y = Inf, 
-                fill = NA, 
-                label = str_glue("n={n}")),
-            data = count_df,
-            vjust = 1.1,
-            hjust = -0.1)
+
+geom_text(aes(x = 0, y = Inf, 
+              fill = NA, 
+              label = str_glue("n={n}")),
+          data = count_df,
+          vjust = 1.1,
+          hjust = -0.1)
 
 ggsave("results/metagenomic_out/relative_abundance.positive_bugs.pdf", width = 12, height = 5)
 
@@ -83,7 +103,7 @@ morsels <- foreach(i = seq(1000)) %do% {
     summarise(n_samples = n_distinct(run_id)) %>%
     mutate(index = i)
 }
-  
+
 n_distinct(long_filt$run_id)
 
 pal <- distinctColorPalette(n_distinct(long_filt$genus))
@@ -96,7 +116,7 @@ bind_rows(morsels) %>%
   theme(legend.position = "none", 
         axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3)) +
   labs(x = "Dominant genus", y = "No. patients")
-  
+
 bind_rows(morsels) %>%
   group_by(genus) %>%
   summarise(n = median(n_samples)) %>%

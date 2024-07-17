@@ -6,23 +6,45 @@ require(vegan)
 require(hillR)
 require(ggpubr)
 
-meta <- fread("data/metadata/parsed_patient_metadata.filt.csv")
+meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
+  inner_join(fread("data/metadata/antibiotic_metadata.csv"))
 
-RA_filt <- fread("results/tax_classification_out/abundance_matrices/RA.S.zeroed.decontam.csv") %>%
+tax_meta <- fread("databases/k2_pluspfp_20240112/inspect.txt")
+fungi <- tax_meta[501:801, ]$V6
+bacteria <- tax_meta[996:20619, ]$V6
+
+# Remove fungi
+read_filt <- fread("results/tax_classification_out/abundance_matrices/read_counts.G.zeroed.decontam.csv") %>%
   filter(run_id %in% meta$run_id) %>%
-  column_to_rownames("run_id")
+  column_to_rownames("run_id") %>%
+  select(any_of(bacteria))
+
+# Rescale relative abundance
+otu_to_RA <- function(df) {
+  mat <- as.matrix(df)
+  RA_df <- as.data.frame(mat / rowSums(mat))
+  RA_df[is.na(RA_df)] <- 0
+  colnames(RA_df) <- colnames(df)
+  
+  return(RA_df)
+}
+
+bact_RA <- otu_to_RA(read_filt)
+bact_RA <- bact_RA[ , colSums(bact_RA) != 0]
 
 # Remove zero taxa
-RA_filt <- RA_filt[rowSums(RA_filt) != 0, ]
 
-hill_shannon <- hill_taxa(comm = RA_filt, q = 1)
+hill_shannon <- hill_taxa(comm = bact_RA, q = 1)
 
 hshan_df <- tibble(run_id = names(hill_shannon),
-                diversity = hill_shannon) %>%
-  left_join(meta) %>%
-  mutate(recent_abx = gsub("sample", "sampling", recent_abx)) %>%
-  mutate(recent_abx = factor(recent_abx, c(NA, "After sampling", "Before sampling")))
+                   diversity = hill_shannon) %>%
+  inner_join(meta)
 
+hshan_df %>%
+  ggplot(aes(x = antibiotics, y = diversity)) +
+  geom_boxplot() +
+  geom_pwc()
+  
 count_df <- hshan_df %>%
   group_by(hap_vap_cap) %>%
   summarise(n = n())
@@ -41,17 +63,17 @@ hshan_df %>%
   scale_fill_discrete(na.value = "grey")
 
 shannon_lr <- glm((as.numeric(factor(hap_vap_cap)) - 1) ~ recent_abx + diversity,
-   data = hshan_df,
-   family = "binomial")
+                  data = hshan_df,
+                  family = "binomial")
 
 summary(shannon_lr)
 
 hill_simpson <- hill_taxa(comm = RA_filt, q = 2)
 
 hsimp_df <- tibble(run_id = names(hill_simpson),
-                diversity = hill_simpson) %>%
+                   diversity = hill_simpson) %>%
   left_join(meta)
-  # filter(hap_vap_cap != "CAP")
+# filter(hap_vap_cap != "CAP")
 
 count_df <- hsimp_df %>%
   group_by(hap_vap_cap, recent_abx) %>%
@@ -62,9 +84,9 @@ hsimp_df %>%
   ggplot(aes(x = hap_vap_cap, y = log10(diversity))) +
   geom_violin() +
   geom_pwc()
-  geom_text(aes(x = hap_vap_cap, y = 1, label = str_glue("n={n}")),
-            data = count_df,
-            position = position_dodge(width = 0.8)) +
+geom_text(aes(x = hap_vap_cap, y = 1, label = str_glue("n={n}")),
+          data = count_df,
+          position = position_dodge(width = 0.8)) +
   labs(x = "Patient group", 
        y = "Hill-Simpson Diversity (Evenness)",
        fill = "Antibiotics given")

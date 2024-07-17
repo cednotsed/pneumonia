@@ -4,42 +4,35 @@ require(data.table)
 require(foreach)
 require(doParallel)
 
-meta <- fread("data/metadata/parsed_patient_metadata.csv")
-high_reads <- fread("results/qc_out/high_read_samples.csv")
+meta <- fread("data/metadata/parsed_patient_metadata.filt.csv")
 
-rank <- "S"
 
-dat <- fread(str_glue("results/metagenomic_out/abundance_matrix.{rank}.tsv")) %>%
+rank <- "G"
+
+dat <- fread(str_glue("results/tax_classification_out/abundance_matrices/abundance_matrix.{rank}.tsv")) %>%
   select(-any_of(c("Homo sapiens", "Homo")), -unclassified) %>%
-  filter(!grepl("EXTRACTION_TEST", run)) %>%
   as_tibble() %>%
-  mutate(run = gsub("INHALE_FRESH_|barcode0|barcode", "", run)) %>%
-  mutate(run = gsub("a|A", "", run, ignore.case = T)) %>%
-  mutate(run_id = gsub("-", "_", run)) %>%
-  select(-run) %>%
-  # Remove runs not in meta
-  filter(run_id %in% meta$run_id) %>%
-  filter(run_id %in% high_reads$run_id) %>%
   column_to_rownames("run_id") 
 
-nrow(dat)
+rownames(dat)
 
 # Microbial counts
 microbe_df <- tibble(run_id = rownames(dat),
        microbial_reads = rowSums(dat))
 
+# microbe_df %>% arrange(microbial_reads) %>% View()
 microbe_df %>%
   ggplot(aes(x = log10(microbial_reads))) +
   geom_histogram() +
-  geom_vline(xintercept = 3,
+  geom_vline(xintercept = 2,
              lty = "dashed",
              color = "red") +
   labs(x = "Log10(microbial reads)", y = "No. samples") 
 
 microbe_df %>%
-  filter(microbial_reads >= 1000) %>%
+  # filter(microbial_reads >= 100) %>%
   nrow()
 
 microbe_df %>%
-  filter(microbial_reads >= 1000) %>%
+  # filter(microbial_reads >= 100) %>%
   fwrite(str_glue("results/qc_out/high_microbe_samples.{rank}.csv"))
