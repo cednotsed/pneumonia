@@ -5,7 +5,6 @@
 #SBATCH --time=48:00:00            # Time limit hrs:min:sec
 #SBATCH --output=/flask/scratch/matthewsp/pneumonia/assembly_scripts/logs/medaka_%A-%a.log    # Standard output and error log
 #SBATCH --cpus-per-task=4
-#SBATCH --gres=gpu:2
 
 source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
 conda activate medaka
@@ -17,6 +16,7 @@ wkdir=/flask/scratch/matthewsp/pneumonia
 fastq_list=new_to_do.txt
 fastq_basedir=$wkdir/data/basecalled_fastqs/no_humans
 fq=$(head -n $SLURM_ARRAY_TASK_ID $fastq_list|tail -n 1)
+fq=LibraryA-barcode07.no_human.fastq.gz
 ass_basedir=$wkdir/results/assembly_out/metaflye_out
 out_basedir=$wkdir/results/assembly_out/medaka_out
 
