@@ -22,6 +22,7 @@ mkdir -p $OUTDIR
 #SLURM_ARRAY_TASK_ID=1
 
 fq=$(head -n $SLURM_ARRAY_TASK_ID $fastq_list|tail -n 1)
+fq=LibraryA-barcode07.no_human.fastq.gz
 fq_path=$FASTQ_DIR/$fq
 prefix=$(echo $fq| sed "s|.fastq.gz||g")
 out_path=$OUTDIR/$prefix.tsv

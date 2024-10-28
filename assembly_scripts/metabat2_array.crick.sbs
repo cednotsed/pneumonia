@@ -15,6 +15,7 @@ wkdir=/flask/scratch/matthewsp/pneumonia
 fastq_list=../tax_classification_scripts/fastq_list.txt
 fastq_basedir=$wkdir/data/basecalled_fastqs/no_humans
 fq=$(head -n $SLURM_ARRAY_TASK_ID $fastq_list|tail -n 1)
+fq=LibraryA-barcode07.no_human.fastq.gz
 in_basedir=$wkdir/results/assembly_out/medaka_out
 prefix=$(echo $fq| sed "s|.fastq.gz||g")
 in_fastq=$fastq_basedir/$fq
