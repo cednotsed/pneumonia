@@ -10,13 +10,36 @@ require(Hmisc)
 meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
   filter(high_microbe_count)
 
-df <- fread("results/amr_out/resfinder_out/resfinder.parsed.decontam.csv") %>%
-  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
-  mutate(class = capitalize(class))
+df <- fread("results/amr_out/amr_matrices/resfinder.amr.decontam.csv") %>%
+  pivot_longer(!run_id, names_to = "class", values_to = "presence") %>%
+  inner_join(meta %>% select(run_id, hap_vap_cap, hap_vap2)) %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP"))
 
 count_df <- df %>%
-  group_by(hap_vap_cap) %>%
+  group_by(hap_vap2) %>%
   summarise(n_total = n_distinct(run_id))
+
+plot_df <- df %>%
+  group_by(hap_vap2, class) %>%
+  summarise(n = sum(presence == 1)) %>%
+  arrange(desc(n)) %>%
+  left_join(count_df) %>%
+  mutate(prop = n / n_total)
+
+plot_df 
+plot_df %>%  
+  ggplot(aes(x = class, y = hap_vap2, fill = prop)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.3, hjust = 1)) +
+  labs(x = "Predicted resistance", y = "HAP subtype", fill = "Prop. patients") 
+
+ggsave("results/amr_out/amr_profiles.pdf", width = 9, height = 3, dpi = 600)
+
+df %>%
+  group_by(hap_vap2, class) %>%
+  summarise(n = sum(presence == 1))
 
 abx_counts <- df %>%
   filter(wgs_predicted_phenotype == "Resistant") %>%
@@ -27,13 +50,13 @@ abx_counts <- df %>%
 plot_df <- df %>%
   filter(wgs_predicted_phenotype == "Resistant") %>%
   filter(class %in% abx_counts$class) %>%
-  group_by(hap_vap_cap, class) %>%
+  group_by(hap_vap2, class) %>%
   summarise(n = n_distinct(run_id)) %>% 
   left_join(count_df) %>%
   mutate(perc = n / n_total * 100)
 
 plot_df %>%
-  ggplot(aes(x = hap_vap_cap, y = class, fill = perc)) +
+  ggplot(aes(x = hap_vap2, y = class, fill = perc)) +
   geom_tile(color = "black") +
   geom_text(aes(label = signif(perc, 2)), color = "white") +
   scale_fill_viridis(option = "cividis") +

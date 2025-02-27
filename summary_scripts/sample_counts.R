@@ -8,23 +8,24 @@ require(ggpubr)
 require(scales)
 require(ggsci)
 
-meta <- fread("data/metadata/parsed_patient_metadata.filt.csv")
+meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP"))
 
 plot_df <- meta %>%
-  group_by(hap_vap_cap) %>%
+  group_by(hap_vap2) %>%
   summarise(cnt = n(), total = nrow(meta))
 
 rpie <- 0.7
 rlabel <-  0.6 * rpie
 
 plot_df %>%
-  mutate(hap_vap_cap = factor(hap_vap_cap, c("CAP", "VAP", "HAP", "healthy", "Water control"))) %>%
+  mutate(hap_vap2 = factor(hap_vap2, c("NV-HAP", "V-HAP", "VAP"))) %>%
   mutate(end_angle = 2 * pi * cumsum(cnt) / total,      # ending angle for each pie slice
          start_angle = lag(end_angle, default = 0),   # starting angle for each pie slice
          mid_angle = 0.5 * (start_angle + end_angle)) %>%  # middle of each pie slice, for the text label
   ggplot() +
   geom_arc_bar(aes(x0 = 0, y0 = 0, r0 = 0, r = rpie,
-                   start = start_angle, end = end_angle, fill = hap_vap_cap)) +
+                   start = start_angle, end = end_angle, fill = hap_vap2)) +
   geom_text(aes(x = rlabel * sin(mid_angle), y = rlabel * cos(mid_angle), label = cnt),
             hjust = 0.5, vjust = 1, size = 5) +
   coord_fixed() +
@@ -39,6 +40,6 @@ plot_df %>%
         axis.ticks.length = unit(0, "pt")) +
   labs(x = NULL, y = NULL, fill = "Sample type")
 
-ggsave("results/metagenomic_out/sample_pie.png",
+ggsave("results/metagenomic_out/sample_pie.pdf",
        width = 5, height = 5)  
 

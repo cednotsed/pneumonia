@@ -1,3 +1,4 @@
+rm(list = ls())
 setwd("c:/git_repos/pneumonia/")
 require(tidyverse)
 require(data.table)
@@ -33,6 +34,7 @@ parsed <- res_df %>%
   select(-run_name) %>%
   arrange(desc(antimicrobial))
 
+
 parsed %>%
   fwrite("results/amr_out/resfinder_out/resfinder.parsed.csv")
 
@@ -58,5 +60,31 @@ morsels <- foreach(run_name = unique(parsed_filt$run)) %do% {
 }
 
 decontam_df <- bind_rows(morsels)
+
 decontam_df %>%
   fwrite("results/amr_out/resfinder_out/resfinder.parsed.decontam.csv")
+
+# Antibiotic matrix
+mat <- decontam_df %>%
+  select(run_id, antimicrobial, wgs_predicted_phenotype) %>%
+  mutate(wgs_predicted_phenotype = ifelse(wgs_predicted_phenotype == "Resistant", 1, 0)) %>%
+  mutate(antimicrobial = gsub("\\+|\\-", "_", antimicrobial)) %>%
+  mutate(antimicrobial = gsub("\\ ", "_", antimicrobial)) %>%
+  pivot_wider(id_cols = run_id, names_from = antimicrobial, values_from = wgs_predicted_phenotype)
+
+mat[is.na(mat)] <- 0
+
+mat %>%
+  fwrite("results/amr_out/amr_matrices/resfinder.amr.decontam.csv")
+
+# Resistance class matrix
+mat <- decontam_df %>%
+  group_by(run_id, class) %>%
+  summarise(wgs_predicted_phenotype = ifelse(sum(wgs_predicted_phenotype == "Resistant", na.rm = T) > 0,
+                                             1, 0)) %>%
+  pivot_wider(id_cols = run_id, names_from = class, values_from = wgs_predicted_phenotype)
+
+mat[is.na(mat)] <- 0
+
+mat %>%
+  fwrite("results/amr_out/amr_matrices/resfinder.class.decontam.csv")

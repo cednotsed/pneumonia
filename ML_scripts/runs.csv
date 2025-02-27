@@ -1,0 +1,16 @@
+HAP,VAP,hap_vap_cap,1
+HAP,VAP,hap_vap_cap,2
+HAP,VAP,hap_vap_cap,5
+HAP,VAP,hap_vap_cap,10
+NV-HAP,V-HAP,hap_vap2,1
+NV-HAP,V-HAP,hap_vap2,2
+NV-HAP,V-HAP,hap_vap2,5
+NV-HAP,V-HAP,hap_vap2,10
+NV-HAP,VAP,hap_vap2,1
+NV-HAP,VAP,hap_vap2,2
+NV-HAP,VAP,hap_vap2,5
+NV-HAP,VAP,hap_vap2,10
+V-HAP,VAP,hap_vap2,1
+V-HAP,VAP,hap_vap2,2
+V-HAP,VAP,hap_vap2,5
+V-HAP,VAP,hap_vap2,10

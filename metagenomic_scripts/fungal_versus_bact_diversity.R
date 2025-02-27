@@ -6,7 +6,6 @@ require(foreach)
 require(vegan)
 require(hillR)
 require(ggpubr)
-require(MASS)
 
 tax_meta <- fread("databases/k2_pluspfp_20240112/inspect.txt")
 fungi <- tax_meta[501:801, ]$V6
@@ -16,10 +15,10 @@ meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
   filter(hap_vap_cap %in% c("HAP", "VAP"))
 
 # Remove fungi
-read_filt <- fread("results/tax_classification_out/abundance_matrices/read_counts.G.zeroed.decontam.csv") %>%
+read_filt <- fread("results/tax_classification_out/abundance_matrices/read_counts.G.zeroed.decontam.2.csv") %>%
   filter(run_id %in% meta$run_id) %>%
   column_to_rownames("run_id") %>%
-  select(any_of(bacteria))
+  dplyr::select(any_of(bacteria))
 
 # Rescale relative abundance
 otu_to_RA <- function(df) {
@@ -64,7 +63,7 @@ gammareg <- glm(diversity ~ sample_type + recent_abx + fungal_rel_a,
                 data = plot_df,
                 family = Gamma())
 
-gamma_sum <- summary(gammareg, dispersion = gamma.dispersion(gammareg))
+gamma_sum <- summary(gammareg, dispersion = MASS::gamma.dispersion(gammareg))
 gamma_p <- signif(coefficients(gamma_sum)["fungal_rel_a", "Pr(>|z|)"], 2)
 
 plot_df %>%
@@ -80,3 +79,4 @@ plot_df %>%
 
 ggsave("results/metagenomic_out/fungal_versus_bacterial.pdf", dpi = 600, 
        width = 3, height = 3)
+

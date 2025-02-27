@@ -8,13 +8,13 @@ require(hillR)
 require(ggpubr)
 require(MKpower)
 
-clin_meta <- fread("data/metadata/parsed_clinical_metadata.csv") %>%
-  left_join(fread("data/metadata/antibiotic_metadata.csv")) %>%
-  mutate(parsed_outcome = ifelse(parsed_outcome %in% c("Not cured", "Died"),
-                                 "Not cured or died",
-                                 parsed_outcome))
+clin_meta <- fread("data/metadata/parsed_clinical_metadata.csv")
+  # mutate(parsed_outcome = ifelse(parsed_outcome %in% c("Not cured", "Died"),
+  #                                "Not cured or died",
+  #                                parsed_outcome))
 
 meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
   filter(high_microbe_count)
 
 RA_filt <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.decontam.2.csv") %>%
@@ -52,22 +52,22 @@ clin_df %>%
   geom_text(aes(label = str_glue("n={n}"), y = 9),
             data = outcome_counts) + 
   theme_classic() +
-  scale_fill_manual(values = c("olivedrab", "grey35")) +
+  scale_fill_manual(values = c("royalblue", "grey80", "red")) +
   labs(x = "Outcome at day 21", y = "Hill-Shannon diversity") +
   theme(legend.position = "none")
 
-ggsave("results/clinical_out/outcome_v_diversity.pdf", dpi = 600, width = 4, height = 4)
+# ggsave("results/clinical_out/outcome_v_diversity.pdf", dpi = 600, width = 4, height = 4)
 
-# Power calculation
-hshan_df %>%
-  filter(parsed_outcome != "Unknown") %>%
-  group_by(parsed_outcome) %>%
-  summarise(sd = sd(diversity))
-
-rx <- function(n) rnorm(n, mean = 0, sd = 2.1) 
-ry <- function(n) rnorm(n, mean = 2, sd = 2.1) 
-## two-sample
-sim.ssize.wilcox.test(rx = rx, ry = ry, n.max = 100, n.min = 3, step.size = 1, iter = 1000)
+# # Power calculation
+# hshan_df %>%
+#   filter(parsed_outcome != "Unknown") %>%
+#   group_by(parsed_outcome) %>%
+#   summarise(sd = sd(diversity))
+# 
+# rx <- function(n) rnorm(n, mean = 0, sd = 2.1) 
+# ry <- function(n) rnorm(n, mean = 2, sd = 2.1) 
+# ## two-sample
+# sim.ssize.wilcox.test(rx = rx, ry = ry, n.max = 100, n.min = 3, step.size = 1, iter = 1000)
 
 # SOFA/PELOD
 plot_df <- clin_df %>% 
@@ -79,7 +79,7 @@ age_counts <- plot_df %>%
   group_by(score_type) %>%
   summarise(n = n())
 
-p1 <- plot_df %>%
+plot_df %>%
   ggplot(aes(x = score, y = diversity, fill = score_type)) +
   geom_smooth(aes(color = score_type), fill = "grey") +
   geom_point(pch = 21, color = "black") +
@@ -90,34 +90,40 @@ p1 <- plot_df %>%
                      guide = "none") +
   scale_fill_manual(values = c("darkseagreen4", "hotpink")) +
   labs(x = "Score", y = "Hill-Shannon diversity", fill = "Organ dysfunction score") +
-  theme_bw() +
-  theme(legend.position = "top")
+  theme_classic() +
+  theme(legend.position = "none")
+
+ggsave("results/clinical_out/sofa_pelod_diversity.pdf", dpi = 600, width = 5, height = 3)
 
 # Duration
 duration_df <- hshan_df %>%
   inner_join(meta) %>%
   mutate(hosp_los_hours = as.numeric(hosp_los_hours),
-         vent_lenght_hours = as.numeric(vent_lenght_hours))
+         vent_length_hours = as.numeric(vent_length_hours))
 
-p2 <- duration_df %>%
+duration_df %>%
   filter(!is.na(hosp_los_hours)) %>%
   ggplot(aes(x = log10(hosp_los_hours), y = diversity)) +
   geom_smooth(color = "steelblue") +
   geom_point(pch = 21, fill = "steelblue", color = "black", alpha = 0.5) +
-  theme_bw() +
+  theme_classic() +
   labs(x = "Log10(length of stay, hours)", y = "Hill-Shannon diversity")
 
-p3 <- duration_df %>%
-  filter(vent_lenght_hours != 0) %>% 
-  ggplot(aes(x = log10(vent_lenght_hours), y = diversity)) +
+ggsave("results/clinical_out/LOS_diversity.pdf", dpi = 600, width = 5, height = 3)
+
+duration_df %>%
+  filter(vent_length_hours != 0) %>% 
+  ggplot(aes(x = log10(vent_length_hours), y = diversity)) +
   geom_smooth(color = "indianred") +
   geom_point(pch = 21, fill = "indianred", color = "black", alpha = 0.5) +
-  theme_bw() +
+  theme_classic() +
   labs(x = "Log10(ventilation duration, hours)", y = "Hill-Shannon diversity")
 
-ggpubr::ggarrange(p1, p2, p3, align = "hv", nrow = 1)
-ggsave("results/clinical_out/duration_versus_diversity.pdf", dpi = 600, 
-       height = 3, width = 8)
+ggsave("results/clinical_out/ventilation_hours_diversity.pdf", dpi = 600, width = 5, height = 3)
+
+# ggpubr::ggarrange(p1, p2, p3, align = "hv", nrow = 1)
+# ggsave("results/clinical_out/duration_versus_diversity.pdf", dpi = 600, 
+#        height = 3, width = 8)
 
 duration_df %>%
   filter(vent_lenght_hours != 0) %>% 

@@ -9,7 +9,7 @@ require(ggpubr)
 meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
   filter(hap_vap_cap %in% c("HAP", "VAP"))
 
-RA_filt <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.decontam.csv") %>%
+RA_filt <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.decontam.2.csv") %>%
   filter(run_id %in% meta$run_id) %>%
   column_to_rownames("run_id")
 
@@ -38,25 +38,33 @@ hshan_df %>%
   labs(x = "Patient group", 
        y = "Hill-Shannon diversity",
        fill = "Pneumonia subtype") +
-  scale_fill_manual(values = c("goldenrod", "blue", "indianred")) +
-  theme_classic()
+  scale_fill_manual(values = c("goldenrod", "steelblue", "indianred")) +
+  theme_classic() +
+  theme(legend.position = "none")
 
 ggsave("results/metagenomic_out/microbial_diversity.genus.pdf", dpi = 600, 
        width = 5, height = 3)
 
-# V-HAP versus HAP
-vent_nonvent <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + diversity,
-                  data = hshan_df,
-                  family = "binomial")
-summary(vent_nonvent)
+# # V-HAP versus HAP
+# vent_nonvent <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + diversity,
+#                   data = hshan_df,
+#                   family = "binomial")
+# summary(vent_nonvent)
+# 
+# hap_vhap <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + diversity,
+#                     data = hshan_df %>% filter(hap_vap2 %in% c("V-HAP", "NV-HAP")),
+#                     family = "binomial")
+# summary(hap_vhap)
+# 
+# hap_vap <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + diversity,
+#                 data = hshan_df %>% filter(hap_vap2 %in% c("VAP", "NV-HAP")),
+#                 family = "binomial")
+# 
+# summary(hap_vap)
 
-hap_vhap <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + diversity,
-                    data = hshan_df %>% filter(hap_vap2 %in% c("V-HAP", "NV-HAP")),
-                    family = "binomial")
-summary(hap_vhap)
+linreg <- lm(log10(diversity) ~ hospital + log10(microbial_reads) + hap_vap2,
+   data = hshan_df)
 
-hap_vap <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + diversity,
-                data = hshan_df %>% filter(hap_vap2 %in% c("VAP", "NV-HAP")),
-                family = "binomial")
-
-summary(hap_vap)
+anova(linreg)
+summary(linreg)
+hist(linreg$residuals)

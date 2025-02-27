@@ -1,10 +1,11 @@
 rm(list = ls())
-setwd("/flask/scratch/matthewsp/pneumonia")
+setwd("c:/git_repos/pneumonia/")
 require(tidyverse)
 require(data.table)
 require(foreach)
 
-irep_dir <- "results/irep_out/irep_out/"
+meta <- fread("data/metadata/irep/irep.config.tsv")
+irep_dir <- "results/irep_out/irep_results/"
 
 irep_list <- list.files(irep_dir, full.names = T)
 irep_list <- irep_list[grepl(".tsv", irep_list)]
@@ -31,7 +32,15 @@ morsels <- foreach(file_name = irep_list) %do% {
 }
 
 irep_df <- bind_rows(morsels) %>%
-    mutate(ref = gsub("/flask/scratch/matthewsp/pneumonia/data/genomes/irep_filt/", "", ref)) %>%
-    mutate(run = gsub("/flask/scratch/matthewsp/pneumonia/results/irep_out/mapping_out/|.sam", "", run))
+    mutate(run = gsub("/mnt/c/git_repos/pneumonia/results/irep_out/mapping_out/", "", run)) %>%
+    separate(run, c("run_id", "taxid"), "\\.") %>%
+    left_join(meta %>% 
+                select(taxa = V2, taxid = V3) %>%
+                mutate(taxid = as.character(taxid)) %>%
+                distinct())
+
+irep_df %>%
+  filter(bPTR != "n/a") %>% View()
+  distinct(taxa)
 
 fwrite(irep_df, "results/irep_out/irep_results.tsv")

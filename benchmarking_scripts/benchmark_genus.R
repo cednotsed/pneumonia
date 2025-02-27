@@ -11,7 +11,7 @@ micro_meta <- fread("data/metadata/parsed_microbiology_results.bacterial_sp_only
 meta_filt <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
   filter(hap_vap_cap %in% c("HAP", "VAP"))
 
-df_filt <- fread("results/tax_classification_out/abundance_matrices/RA.G.relaxed.csv") %>%
+df_filt <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.decontam.2.csv") %>%
   filter(run_id %in% meta_filt$run_id) %>%
   filter(run_id %in% micro_meta$run_id)
 
@@ -41,6 +41,20 @@ morsels <- foreach(id = df_filt$run_id) %do% {
   
   return(itx_df)
 }
+
+plot_df <- bind_rows(morsels) %>% 
+  mutate(prop_identified = n_intersect / n_identified)
+
+plot_df %>%
+  group_by(method) %>%
+  summarise(n_poor = sum(n_intersect == n_identified) / n_distinct(run_id),
+            n_patients = n_distinct(run_id))
+
+plot_df %>%
+  group_by(method) %>%
+  summarise(sum_sequenced = sum(n_intersect),
+            sum_total = sum(n_identified))
+
 
 bind_rows(morsels) %>% 
   filter(method == "curetis") %>%

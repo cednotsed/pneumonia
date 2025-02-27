@@ -22,5 +22,6 @@ merged_df %>%
   summarise(n = n())
 
 merged_df %>%
+  left_join(fread("data/metadata/antibiotic_metadata.csv")) %>%
   fwrite("data/metadata/parsed_clinical_metadata.csv")
 

@@ -15,9 +15,7 @@ check_df <- fread("results/assembly_out/checkm2_out/quality_report.tsv") %>%
 tax_df <- fread("results/assembly_out/tax_out/classify/gtdbtk.bac120.summary.tsv") %>%
   dplyr::rename(genome_name = user_genome)
 
-merged <- check_df %>%
-  filter(completeness >= 90, 
-         contamination <= 5) %>%
+merged_all <- check_df %>%
   # Parse taxonomy
   left_join(tax_df) %>%
   mutate(classification = gsub("d__|p__|c__|o__|f__|g__|s__", "", classification)) %>%
@@ -41,22 +39,50 @@ merged <- check_df %>%
          gc_content, coding_density, contig_n50, 
          average_gene_length, total_coding_sequences,
          checkm2_notes = additional_notes, gtdbtk_warnings = warnings) %>%
+  mutate(hospital = ifelse(grepl("Library", genome_name), "Local GP (controls)", hospital))
+
+merged <- merged_all %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
+  filter(checkm2_completeness >= 90, 
+         checkm2_contamination <= 5) %>%
   # Remove ambiguous taxonomic assignments
   filter(gtdbtk_warnings == "N/A") %>%
-  mutate(hospital = ifelse(grepl("Library", genome_name), "Local GP (controls)", hospital))
+  mutate(parsed_species = case_when(grepl("Streptococcus oralis", species) ~ "Streptococcus oralis",
+                                    grepl("Haemophilus influenzae", species) ~ "Haemophilus influenzae",
+                                    TRUE ~ species))
+
+fwrite(merged_all, "results/assembly_out/assembly_merged_metadata.csv")
+
+# genus and species count
+merged %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
+  summarise(n_species = n_distinct(species),
+            n_genera = n_distinct(genus),
+            median_n50 = median(contig_n50),
+            lower_n50 = quantile(contig_n50, 0.25),
+            upper_n50 = quantile(contig_n50, 0.75))
 
 # Stratify by species and site
 plot_df <- merged %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
   group_by(species, hospital) %>%
   summarise(n = n()) %>%
   arrange(desc(n))
 
 merged %>%
-  group_by(hap_vap_cap) %>%
-  summarise(n = n())
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
+  group_by(species) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n)) %>% View()
+
+merged %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
+  group_by(species) %>% 
+  summarise(n = n()) %>% 
+  arrange(desc(n)) %>% View()
 # Total counts per species
 sp_count <- merged %>%
-  group_by(species) %>%
+  group_by(parsed_species) %>%
   summarise(n = n()) %>%
   arrange(desc(n))
 
@@ -98,7 +124,7 @@ plot_genus_df %>%
         legend.position = "top") +
   labs(x = "Species", y = "No. assemblies", fill = "Site")
 
-ggsave("results/assembly_out/assembly_summary_counts.pdf", dpi = 600, width = 7, height = 3)
+ggsave("results/assembly_out/assembly_summary_counts.pdf", dpi = 600, width = 7, height = 5)
 
 merged %>%
   group_by(genus) %>%
@@ -116,8 +142,10 @@ merged %>%
 check_df %>% 
   ggplot(aes(x = completeness)) +
   geom_histogram()
+
 # Extract genome list for top pathogens
 merged %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
   filter(species == "Staphylococcus aureus") %>%
   # filter(species == "Klebsiella pneumoniae") %>%
   mutate(genome_path = str_glue("{genome_name}.fna")) %>%
@@ -127,6 +155,7 @@ merged %>%
          col.names = F)
 
 merged %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
   filter(species == "Escherichia coli") %>%
   # filter(species == "Moraxella catarrhalis") %>%
   # filter(species == "Klebsiella pneumoniae") %>%
@@ -137,6 +166,27 @@ merged %>%
          col.names = F)
 
 merged %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
+  filter(grepl("Haemophilus", species)) %>% 
+  mutate(genome_path = str_glue("{genome_name}.fna")) %>%
+  select(genome_path) %>%
+  fwrite("data/metadata/bug_metadata/h_influenzae.assemblies.txt",
+         eol = "\n",
+         col.names = F)
+
+merged %>%
   summarise(median_n50 = median(contig_n50),
             lower_n50 = quantile(contig_n50, 0.25),
             upper_n50 = quantile(contig_n50, 0.75))
+
+merged_all %>%
+  # filter(h/ap_vap_cap %in% c("HAP", "VAP")) %>%
+  filter(grepl("Haemophilus influenzae", species)) %>% View()
+
+merged_all %>% 
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
+  filter(checkm2_completeness >= 90, checkm2_contamination <= 5) %>% 
+  # separate(species, c("species"), "\\_") %>%
+  group_by(species) %>% 
+  summarise(n = n()) %>%
+  arrange(desc(n))

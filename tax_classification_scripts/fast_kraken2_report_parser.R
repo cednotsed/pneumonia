@@ -95,9 +95,10 @@ final_parsed <- final_parsed[, to_keep] %>%
   rownames_to_column("run") %>%
   # Parse run ids
   filter(!grepl("EXTRACTION_TEST", run)) %>%
-  mutate(run = gsub("\\.no_human|Library|_raw|INHALE_FRESH_|barcode0|barcode", "", run)) %>%
+  mutate(run = gsub("\\.no_human|Library|_raw|INHALE_FRESH_|barcode0|barcode", "", run)) %>% 
   mutate(run = gsub("a|A", "", run, ignore.case = T)) %>%
   mutate(run_id = gsub("-", "_", run)) %>%
+  mutate(run_id = ifelse(run_id == "_7", "A_7", run_id)) %>%
   select(-run) %>%
   # Remove runs not in meta
   filter(run_id %in% meta$run_id)

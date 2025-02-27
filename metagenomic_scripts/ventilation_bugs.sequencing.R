@@ -54,18 +54,19 @@ plot_df <- long_df %>%
 
 # Plot differences
 plot_df %>%
-  mutate(taxa = factor(taxa, rev(microbe_counts$taxa))) %>%
-  ggplot(aes(x = ventilation, y = taxa, fill = perc)) +
+  mutate(taxa = factor(taxa, microbe_counts$taxa)) %>%
+  ggplot(aes(y = ventilation, x = taxa, fill = perc)) +
   geom_tile(color = "black") +
   scale_fill_viridis(option = "mako") +
   theme_classic() +
-  geom_text(aes(label = signif(perc, 2)),
+  geom_text(aes(label = signif(perc, 1)),
             color = "white") +
-  labs(x = "Patient type", y = "Pathogen",
-       fill = "% positive tests")
+  labs(y = "Patient type", x = "Pathogen",
+       fill = "% positive tests") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.3, face = "italic"))
 
 ggsave("results/metagenomic_out/ventilation_pathogens.sequencing.genus.pdf", dpi = 600,
-       height = 6, width = 5)
+       height = 3, width = 10)
 
 n_mat <- plot_df %>%
   filter(taxa %in% microbe_count_filt$taxa) %>%

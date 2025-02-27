@@ -5,6 +5,7 @@ require(data.table)
 require(foreach)
 require(vegan)
 require(ape)
+require(ggpubr)
 
 meta_filt <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
   filter(high_microbe_count) %>%
@@ -34,9 +35,11 @@ min(plot_df$Axis.2)
 max(plot_df$Axis.2)
 
 p1 <- plot_df %>%
-  ggplot(aes(Axis.1, Axis.2, color = hap_vap2, shape = hap_vap2)) +
-  geom_point(alpha = 0.8, size = 3) +
-  scale_color_manual(values = c("goldenrod", "blue", "indianred")) +
+  ggplot(aes(Axis.1, Axis.2, fill = hap_vap2, shape = hap_vap2)) +
+  geom_point(color = "black",
+             alpha = 0.8, size = 3) +
+  scale_fill_manual(values = c("goldenrod", "steelblue", "indianred")) +
+  scale_shape_manual(values = c(21, 22, 23)) +
   theme_classic() + 
   ylim(-0.6, 0.7) +
   xlim(-0.7, 0.7) +
@@ -48,7 +51,7 @@ p1 <- plot_df %>%
 a1 <- plot_df %>%
   ggplot(aes(y = Axis.1, x = hap_vap2, fill = hap_vap2)) +
   geom_boxplot() +
-  scale_fill_manual(values = c("goldenrod", "blue", "indianred")) +
+  scale_fill_manual(values = c("goldenrod", "steelblue", "indianred")) +
   theme_bw() +
   geom_pwc(label.size = 3, step.increase = 0.05) +
   coord_flip() +
@@ -62,7 +65,7 @@ a1 <- plot_df %>%
 a2 <- plot_df %>%
   ggplot(aes(x = hap_vap2, y = Axis.2, fill = hap_vap2)) +
   geom_boxplot() +
-  scale_fill_manual(values = c("goldenrod", "blue", "indianred")) +
+  scale_fill_manual(values = c("goldenrod", "steelblue", "indianred")) +
   theme_bw() +
   geom_pwc(label.size = 3, step.increase = 0.05) +
   ylim(-0.6, 0.7) +
@@ -73,32 +76,39 @@ a2 <- plot_df %>%
   labs(y = str_glue("PCo2 ({eigenvals[2]}%)"))
 
 ggarrange(a2, p1, ggplot(), a1, nrow = 2, ncol = 2,
-          heights = c(3, 1), widths = c(1, 4),
+          heights = c(2.5, 1), widths = c(1, 6),
           align = "hv")
 
 ggsave("results/metagenomic_out/PCoA.decontamination.genus.pdf",
-       height = 5, width = 7)
+       height = 4, width = 9)
 
+linreg1 <- lm(Axis.1 ~ hospital + log10(microbial_reads) + hap_vap2,
+              data = plot_df)
+anova(linreg1)
+
+linreg2 <- lm(Axis.2 ~ hospital + log10(microbial_reads) + hap_vap2,
+              data = plot_df)
+
+anova(linreg2)
 
 # Logistic regression
 # V-HAP versus HAP
-vent_nonvent <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + Axis.1 + Axis.2,
-                    data = plot_df,
-                    family = "binomial")
-
-summary(vent_nonvent)
-
-hap_vhap <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + Axis.1 + Axis.2,
-                data = plot_df %>% filter(hap_vap2 %in% c("V-HAP", "NV-HAP")),
-                family = "binomial")
-summary(hap_vhap)
-
-hap_vap <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + Axis.1 + Axis.2 + Axis.3,
-               data = plot_df %>% filter(hap_vap2 %in% c("VAP", "NV-HAP")),
-               family = "binomial")
-
-summary(hap_vap)
-
+# vent_nonvent <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + Axis.1 + Axis.2,
+#                     data = plot_df,
+#                     family = "binomial")
+# 
+# summary(vent_nonvent)
+# 
+# hap_vhap <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + Axis.1 + Axis.2,
+#                 data = plot_df %>% filter(hap_vap2 %in% c("V-HAP", "NV-HAP")),
+#                 family = "binomial")
+# summary(hap_vhap)
+# 
+# hap_vap <- glm(ventilation ~ recent_abx + sample_type + microbial_reads + Axis.1 + Axis.2 + Axis.3,
+#                data = plot_df %>% filter(hap_vap2 %in% c("VAP", "NV-HAP")),
+#                family = "binomial")
+# 
+# summary(hap_vap)
 # pca <- prcomp(RA_filt %>%
 #                 rownames_to_column("run_id") %>%
 #                 filter(!(run_id %in% c("31_4", "22_8"))) %>%

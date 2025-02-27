@@ -11,7 +11,7 @@ require(randomcoloR)
 meta_filt <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
   filter(high_microbe_count)
 
-df_filt <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.decontam.csv") %>%
+df_filt <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.decontam.2.csv") %>%
   filter(run_id %in% meta_filt$run_id)
 
 long_df <- df_filt %>%

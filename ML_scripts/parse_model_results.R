@@ -26,12 +26,18 @@ df <- bind_rows(morsels) %>%
   mutate(id = gsub(file_dir, "", id)) %>%
   mutate(id = gsub(".csv", "", id)) %>%
   separate(id, c("exp", "type"), "\\.")
-
+df
 df %>%
+  mutate(exp = factor(exp, c("nvhap_vap", "nvhap_vhap", "vhap_vap",
+                             "HAP_VAP", "vent_nonvent", "just_meta"))) %>%
   ggplot(aes(x = exp, y = test_F1, fill = type)) +
   geom_bar(stat = "identity", position = "dodge", color = "black") +
   scale_fill_manual(values = c("olivedrab")) +
   labs(x = "XGBoost Model", y = "Performance (F1 score)") +
   theme_bw()
 
-ggsave("results/ML_out/model_results.pdf", dpi = 600, height = 4, width = 4)
+ggsave("results/ML_out/model_results.pdf", dpi = 600, height = 4, width = 6)
+
+df %>%
+  select(-test_precision, -test_recall, -test_AUROC) %>% 
+  arrange(desc(exp), desc(type)) %>% View()

@@ -13,7 +13,7 @@ meta <- fread("data/metadata/parsed_patient_metadata.filt.csv")
 meta_filt <- meta %>%
   filter(hap_vap_cap %in% c("HAP", "VAP"))
 
-undiagnosed_ids <- fread("results/benchmarking_out/undiagnosed_ids.txt", header = F)$V1
+undiagnosed_ids <- fread("results/benchmarking_out/undiagnosed_ids.txt")$run_id
 
 control_meta <- meta %>%
   filter(hap_vap_cap == "Water control")
@@ -28,8 +28,8 @@ bact_meta <- fread("data/metadata/parsed_microbiology_results.bacterial_sp_only.
   filter(run_id %in% meta_filt$run_id)
 
 # Sequencing detection
-RA_df <- fread("results/tax_classification_out/abundance_matrices/RA.S.zeroed.decontam.1.csv")
-read_df <- fread("results/tax_classification_out/abundance_matrices/read_counts.S.zeroed.decontam.1.csv")
+RA_df <- fread("results/tax_classification_out/abundance_matrices/RA.S.zeroed.decontam.2.csv")
+read_df <- fread("results/tax_classification_out/abundance_matrices/read_counts.S.zeroed.decontam.2.csv")
 
 long_RA_df <- RA_df %>%
   pivot_longer(!run_id, names_to = "species", values_to = "rel_a")
@@ -99,8 +99,37 @@ ggarrange(p1, p2, p3,
 ggsave("results/benchmarking_out/undiagnosed_dominant_bugs.pdf", dpi = 600,
        width = 12, height = 4)
 
-# Save species
 plot_df %>%
-  distinct(run_id, species) %>%
-  fwrite("results/benchmarking_out/undiagnosed_dominant_bugs.csv")
+  summarise(median_read = median(read_count),
+            median_a = median(rel_a))
+# Save species
+# plot_df %>%
+#   distinct(run_id, species) %>%
+#   fwrite("results/benchmarking_out/undiagnosed_dominant_bugs.csv")
+
+# long_read_df %>%
+#   filter(run_id %in% undiagnosed_ids) %>%
+#   filter(!grepl("Candida|Aspergillus|Penicillium|virus|Talaromyces|Nakaseomyces|Saccharomyces", species)) %>% 
+#   filter(read_count >= 10000) %>%
+#   fwrite("data/metadata/irep/undiagnosed_bugs.csv", 
+#          eol = "\n")
+  
+# Check controls
+contam_RA_df <- fread("results/tax_classification_out/abundance_matrices/RA.S.zeroed.csv") %>%
+  pivot_longer(!run_id, names_to = "species", values_to = "rel_a")
+
+control_RA <- contam_RA_df %>%
+  # filter(run_id %in% control_meta$run_id) %>%
+  right_join(control_meta %>% select(run_id, run))
+
+control_RA %>%
+  group_by(run) %>%
+  summarise(n = n_distinct(run_id)) %>%
+  arrange(desc(n))
+
+plot_df %>%
+  left_join(meta %>%
+              select(run, run_id)) %>%
+  left_join(control_RA %>% select(run, species, control_rel_a = rel_a)) %>%
+  mutate(fold_diff = rel_a / control_rel_a) %>% View()
 

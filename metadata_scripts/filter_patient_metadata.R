@@ -58,5 +58,15 @@ final %>%
   left_join(microbe_df) %>% 
   mutate(microbial_reads = ifelse(is.na(microbial_reads), 0, microbial_reads)) %>%
   mutate(high_microbe_count = microbial_reads >= 100) %>%
+  filter(run != 1, hap_vap_cap != "CAP") %>%
   fwrite("data/metadata/parsed_patient_metadata.filt.csv")
 
+final %>%
+  left_join(microbe_df) %>% 
+  mutate(microbial_reads = ifelse(is.na(microbial_reads), 0, microbial_reads)) %>%
+  mutate(high_microbe_count = microbial_reads >= 100) %>%
+  filter(run != 1, hap_vap_cap != "CAP") %>% 
+  group_by(hap_vap2) %>%
+  summarise(n = n())
+
+fread("data/metadata/bug_metadata/s_aureus.assemblies.txt")

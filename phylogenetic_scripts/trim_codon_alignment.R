@@ -5,8 +5,8 @@ require(data.table)
 require(foreach)
 require(Biostrings)
 
-bug_prefix <- "s_aureus"
-# bug_prefix <- "e_coli"
+# bug_prefix <- "s_aureus"
+bug_prefix <- "e_coli"
 # bug_prefix <- "h_influenzae"
 aln_path <- str_glue("data/alignments/{bug_prefix}.core_gene_alignment_filtered.snps.aln")
 out_path <- str_glue("data/alignments/{bug_prefix}.core_gene_alignment_filtered.snps.trimmed.aln")

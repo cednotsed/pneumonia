@@ -14,7 +14,7 @@ morsels <- foreach(id = unique(meta$run_id)) %do% {
     filter(run_id == id)
   
   micro <- tibble(run_id = id, 
-                  bugs = str_split(temp$micro_organism, "\\;", simplify = T)[1, ],
+                  bugs = str_split(temp$culture_organism, "\\;", simplify = T)[1, ],
                   method = "culture")
   biofire <- tibble(run_id = id, 
                   bugs = str_split(temp$biofire_organism, "\\;", simplify = T)[1, ],
@@ -45,6 +45,8 @@ parsed <- bind_rows(morsels) %>%
 parsed %>%
   fwrite("data/metadata/parsed_microbiology_results.csv")
 
+parsed %>%
+  distinct(bugs)
 parsed_filt <- parsed %>%
   filter(bugs != "Invalid test") %>%
   filter(bug_genus != "Coliform") %>%
@@ -59,3 +61,14 @@ parsed_filt <- parsed %>%
 parsed_filt %>%
   fwrite("data/metadata/parsed_microbiology_results.bacterial_sp_only.csv")
 
+read_df <- fread("results/tax_classification_out/abundance_matrices/RA.S.zeroed.csv")
+taxa_list <- colnames(read_df)
+to_keep <- taxa_list[grepl("Enterobacter|calcoaceticus|Proteus|pittii|nosocomialis", taxa_list)]
+
+parsed_filt %>%
+  filter(!(bugs %in% c("Negative", "Invalid test"))) %>%
+  distinct(bugs) %>% 
+  bind_rows(tibble(bugs = to_keep)) %>% 
+  filter(!grepl("calcoaceticus-baumannii|Proteus spp.|Enterobacter spp.", bugs)) %>% 
+  mutate(bugs = ifelse(grepl("complex|group", bugs), "Enterobacter cloacae complex sp.", bugs)) %>% 
+  fwrite("data/metadata/parsed_microbiology_results.species_list.csv")

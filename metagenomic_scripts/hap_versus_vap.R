@@ -8,6 +8,11 @@ require(viridis)
 
 meta <- fread("data/metadata/parsed_patient_metadata.filt.csv")
 
+meta %>%
+  filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
+  group_by(hap_vap2) %>%
+  summarise(n = n())
+
 meta_filt <- meta %>%
   filter(hap_vap_cap %in% c("HAP", "VAP")) %>%
   filter(high_microbe_count) %>%

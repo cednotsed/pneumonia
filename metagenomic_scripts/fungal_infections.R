@@ -4,6 +4,7 @@ require(tidyverse)
 require(data.table)
 require(foreach)
 
+undiagnosed_ids <- fread("results/benchmarking_out/undiagnosed_ids.txt", header = F)$V1
 tax_meta <- fread("databases/k2_pluspfp_20240112/inspect.txt")
 fungi <- tax_meta[501:801, ]$V6
 
@@ -21,47 +22,56 @@ long_df <- df_filt %>%
 fungal_df <- long_df %>%
   filter(taxa %in% fungi)
 
+fungal_df %>%
+  fwrite("results/fungal_out/fungal_runs.csv")
+
 # PCR and Culture of fungal patients
 micro_meta <- fread("data/metadata/parsed_microbiology_results.csv") %>%
-  filter(bugs != "Invalid test")
+  filter(run_id %in% long_df$run_id)
 
 # Plot fungal abundance
 # fungal_mat <- fungal_df %>%
 #   pivot_wider(id_cols = run_id, names_from = taxa, values_from = rel_a) %>%
 #   column_to_rownames("run_id")
 
-plot_df <- fungal_df %>%
+parsed <- fungal_df %>%
   filter(rel_a != 0) %>%
-  left_join(meta_filt %>% select(run_id, hap_vap_cap))
+  left_join(meta_filt %>% select(run_id, hap_vap2)) %>%
+  mutate(undiagnosed = run_id %in% undiagnosed_ids)
 
-fungi_filt <- plot_df %>% 
+fungi_filt <- plot_df %>%
   group_by(taxa) %>%
   summarise(n = n()) %>%
   filter(n != 1)
 
+plot_df <- parsed %>%
+  mutate(taxa = ifelse(taxa %in% fungi_filt$taxa, taxa, "Others")) %>%
+  group_by(run_id, taxa, hap_vap2, undiagnosed) %>%
+  summarise(rel_a = sum(rel_a)) %>%
+  ungroup()
+
 order_df <- plot_df %>%
-  mutate(taxa %in% fungi_filt$taxa) %>%
   group_by(run_id) %>%
   summarise(total_rel_a = sum(rel_a)) %>%
   arrange(desc(total_rel_a))
 
 count_df <- plot_df %>% 
   filter(rel_a != 0) %>%
-  filter(taxa %in% fungi_filt$taxa) %>%
-  distinct(run_id, hap_vap_cap) %>%
-  group_by(hap_vap_cap) %>%
+  # filter(taxa %in% fungi_filt$taxa) %>%
+  distinct(run_id, undiagnosed) %>%
+  group_by(undiagnosed) %>%
   summarise(n = n())
 
 plot_df %>% 
   filter(rel_a != 0) %>% 
-  group_by(hap_vap_cap) %>% summarise(n = n_distinct(run_id))
+  group_by(hap_vap2) %>% 
+  summarise(n = n_distinct(run_id))
 
 # pal <- distinctColorPalette(n_distinct(fungi_filt$taxa))
-pal <- c("#DB8F95", "#A4CBD0", "black", "#BA6AD9")
+pal <- c("#DB8F95", "#A4CBD0", "black", "#BA6AD9", "#E0E4CCFF")
 
 plot_df %>%
   filter(rel_a != 0) %>%
-  filter(taxa %in% fungi_filt$taxa) %>%
   mutate(run_id = factor(run_id, order_df$run_id)) %>%
   ggplot(aes(x = run_id, y = rel_a, fill = taxa)) +
   geom_bar(stat = "identity",
@@ -69,7 +79,7 @@ plot_df %>%
            color = "black") +
   scale_fill_manual(values = pal, na.translate = F) +
   theme_classic() +
-  facet_grid(cols = vars(hap_vap_cap), scales = "free", space = "free") +
+  facet_grid(cols = vars(undiagnosed), scales = "free", space = "free") +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.position = "top") +
@@ -84,6 +94,12 @@ geom_text(aes(x = 0, y = Inf,
 
 ggsave("results/metagenomic_out/fungal.pdf", dpi = 600, width = 6, height = 4)
 
+test <- plot_df %>%
+  filter(rel_a != 0) %>%
+  filter(taxa %in% fungi_filt$taxa)
+
+plot_df %>%
+  filter(!(run_id %in% test$run_id))
 # Relative abundance of fungi
 plot_df %>%
   filter(rel_a > 0.5) %>%
@@ -93,7 +109,7 @@ plot_df %>%
 # Controls
 control_meta <- fread("data/metadata/parsed_patient_metadata.filt.csv") %>%
   filter(high_microbe_count) %>%
-  filter(hap_vap_cap == "healthy")
+  filter(hap_vap_cap == "Healthy")
 
 control_RA <- fread("results/tax_classification_out/abundance_matrices/RA.G.zeroed.csv") %>%
   filter(run_id %in% control_meta$run_id)
@@ -106,11 +122,12 @@ control_filt %>%
   filter(taxa %in% fungi)
 
 # Undiagnosed
-undiagnosed_ids <- fread("results/benchmarking_out/undiagnosed_ids.txt", header = F)$V1
-
 plot_df %>%
-  filter(run_id %in% undiagnosed_ids) %>%
-  filter(rel_a > 0.5) %>%
+  filter(run_id %in% undiagnosed_ids) %>% 
+  distinct(run_id) %>%
+  nrow()
+plot_df %>%
+  filter(run_id %in% undiagnosed_ids) %>% 
   distinct(run_id) %>%
   nrow()
 

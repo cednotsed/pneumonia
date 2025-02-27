@@ -33,7 +33,7 @@ count_df <- parsed %>%
   group_by(taxa) %>%
   summarise(n = n_distinct(run_id)) %>%
   arrange(desc(n)) %>%
-  mutate(prop = n / n_distinct(long_df$run_id)) %>%
+  mutate(prop = n / nrow(meta_filt)) %>%
   head(30)
 
 plot_df <- parsed %>%
@@ -41,12 +41,12 @@ plot_df <- parsed %>%
   group_by(taxa) %>%
   summarise(n = n_distinct(run_id)) %>%
   arrange(desc(n)) %>%
-  mutate(prop = n / n_distinct(long_df$run_id)) 
+  mutate(prop = n / nrow(meta_filt)) %>%
+  mutate(is_pathogen = taxa %in% micro_meta$bugs)
 
 plot_df %>%  
-  mutate(is_commensal = taxa %in% micro_meta$bugs) %>%
   mutate(taxa = factor(taxa, count_df$taxa)) %>%
-  ggplot(aes(x = taxa, y = prop, fill = is_commensal)) +
+  ggplot(aes(x = taxa, y = prop, fill = is_pathogen)) +
   geom_bar(stat = "identity", color = "black") +
   theme_classic() +
   scale_fill_manual(values = c("darkseagreen4", "khaki3")) +
@@ -58,3 +58,6 @@ ggsave("results/benchmarking_out/bug_proportions.sequencing.pdf",
        dpi = 600, 
        width = 7, 
        height = 3)
+
+plot_df %>% filter(is_pathogen) %>%
+  arrange(desc(prop))
