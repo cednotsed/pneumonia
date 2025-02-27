@@ -2,15 +2,15 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --time=48:00:00
-#SBATCH --mem=200G
+#SBATCH --mem=500G
 #SBATCH --partition=ncpu
 
 source /nemo/lab/matthewsp/home/shared/cedric/utils/miniconda3/etc/profile.d/conda.sh
 conda activate philodendron
 
-#bug_prefix=e_coli
-bug_prefix=m_catarrhalis
-#bug_prefix=s_aureus
+bug_prefix=e_coli
+bug_prefix=h_influenzae
+bug_prefix=s_aureus
 
 wkdir=/flask/scratch/matthewsp/pneumonia
 tree_path=$wkdir/data/trees/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.vfasttree.tree
@@ -23,5 +23,7 @@ run_gubbins.py \
     --starting-tree $tree_path \
     --prefix $out_prefix \
     --model GTRGAMMA \
-    $aln_path
+    --filter-percentage 50 \
+    $aln_path 
 
+#     --resume $wkdir/phylogenetic_scripts/$bug_prefix.core_gene_alignment_filtered.snps.trimmed.iteration_1.tre \
